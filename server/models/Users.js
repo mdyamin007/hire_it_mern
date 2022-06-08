@@ -12,6 +12,7 @@ const UserSchema = new mongoose.Schema({
 
   email: {
     type: String,
+    unique: true,
     required: true,
   },
   password: {
@@ -33,4 +34,4 @@ UserSchema.set("toJSON", {
   virtuals: true,
 });
 
-exports.User = mongoose.model("User", UserSchema);
+module.exports = mongoose.model("User", UserSchema);

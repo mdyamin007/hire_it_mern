@@ -44,4 +44,4 @@ CV_UploadSchema.set("toJSON", {
   virtuals: true,
 });
 
-exports.CV_Upload = mongoose.model("CV_Upload", CV_UploadSchema);
+module.exports = mongoose.model("CV_Upload", CV_UploadSchema);

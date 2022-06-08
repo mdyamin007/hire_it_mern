@@ -64,7 +64,4 @@ Job_DescriptionSchema.set("toJSON", {
   virtuals: true,
 });
 
-exports.Job_Description = mongoose.model(
-  "Job_Description",
-  Job_DescriptionSchema,
-);
+module.exports = mongoose.model("Job_Description", Job_DescriptionSchema);
