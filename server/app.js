@@ -1,18 +1,19 @@
-var http = require("http"),
-  path = require("path"),
-  methods = require("methods"),
-  express = require("express"),
-  bodyParser = require("body-parser"),
-  session = require("express-session"),
-  cors = require("cors"),
-  passport = require("passport"),
-  errorhandler = require("errorhandler"),
-  mongoose = require("mongoose");
+const http = require("http");
+const path = require("path");
+const methods = require("methods");
+const express = require("express");
+const bodyParser = require("body-parser");
+const session = require("express-session");
+const cors = require("cors");
+const passport = require("passport");
+const errorhandler = require("errorhandler");
+const mongoose = require("mongoose");
+const userRouter = require("./routers/users");
 
-var isProduction = process.env.NODE_ENV === "production";
+const isProduction = process.env.NODE_ENV === "production";
 
 // Create global app object
-var app = express();
+const app = express();
 
 app.use(cors());
 
@@ -30,7 +31,7 @@ app.use(
     cookie: { maxAge: 60000 },
     resave: false,
     saveUninitialized: false,
-  })
+  }),
 );
 
 if (!isProduction) {
@@ -44,12 +45,7 @@ if (isProduction) {
   mongoose.set("debug", true);
 }
 
-require("./models/User");
-require("./models/Article");
-require("./models/Comment");
-require("./config/passport");
-
-app.use(require("./routes"));
+app.use("/api/v1/users", userRouter);
 
 /// catch 404 and forward to error handler
 app.use(function (req, res, next) {

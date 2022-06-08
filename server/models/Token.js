@@ -27,4 +27,4 @@ TokenSchema.set("toJSON", {
   virtuals: true,
 });
 
-exports.TokenSchema = mongoose.model("Token", TokenSchema);
+module.exports = mongoose.model("Token", TokenSchema);
