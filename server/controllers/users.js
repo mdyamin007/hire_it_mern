@@ -1,19 +1,35 @@
-const User = require("../models/Users");
 const UserService = require("../services/user");
+const brypt = require("bcrypt");
+const Token = require("../models/Token");
+const { User, validate } = require("../models/Users");
+const sendEmail = require("../utils/sendEmail");
 
 //Post a new user
-const createUser = async (req, res) => {
+const signUp = async (req, res) => {
   try {
-    const user = new User(req.body);
-    await UserService.createUser(user);
-
-    res.status(201).json({
-      message: "User created successfully",
-      user: user,
-    });
+    const { error } = validate(req.body);
+    if (error) return res.status(400).send(error.details[0].message);
+    const user = await UserService.findOne({ email: req.body.email });
+    if (user) return res.status(400).send("User already registered");
+    const salt = await brypt.genSalt(10);
+    const hashedPassword = await brypt.hash(req.body.password, salt);
+    const newUser = new User({
+      ...req.body,
+      password: hashedPassword,
+    }).save();
+    const token = await new Token({
+      userId: newUser.id,
+      token: crypto.randomBytes(32).toString("hex"),
+    }).save();
+    const url = `http://localhost:3000/singUp/${user.id}/verify/${token.token}`;
+    await sendEmail(user.email, "Verify Email", url);
+    res
+      .status(201)
+      .send({ message: "An Email sent to your account please verify it" });
   } catch (err) {
+    console.log(err);
     res.status(500).json({
-      message: err.message,
+      message: "Internal server error",
     });
   }
 };
@@ -84,7 +100,7 @@ const deleteUser = async (req, res) => {
 //Get a user by email
 
 module.exports = {
-  createUser,
+  signUp,
   findAll,
   findById,
   updateUser,

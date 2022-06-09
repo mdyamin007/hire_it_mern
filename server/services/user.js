@@ -35,10 +35,21 @@ const deleteUser = async (userId) => {
   return foundUser;
 };
 
+const findOne = async (payload) => {
+  const foundUser = await User.find(payload);
+
+  if (!foundUser) {
+    throw new Error(`User not found`);
+  }
+
+  return foundUser;
+};
+
 module.exports = {
   createUser,
   findById,
   findAll,
   update,
   deleteUser,
+  findOne,
 };
