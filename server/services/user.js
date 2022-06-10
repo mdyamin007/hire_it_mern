@@ -1,7 +1,7 @@
-const User = require("../models/Users");
+const { User, validate } = require("../models/Users");
 
 const createUser = async (user) => {
-  return user.save();
+  return await User.create(user);
 };
 
 const findById = async (userId) => {
@@ -26,6 +26,15 @@ const update = async (userId, user) => {
   return foundUser;
 };
 
+const updateOne = async (filter, updateData) => {
+  const foundUser = await User.updateOne(filter, updateData);
+
+  if (!foundUser) {
+    throw new Error(`User ${data._id} not found`);
+  }
+  return foundUser;
+};
+
 const deleteUser = async (userId) => {
   const foundUser = await User.findByIdAndDelete(userId);
 
@@ -35,10 +44,21 @@ const deleteUser = async (userId) => {
   return foundUser;
 };
 
+const findOne = async (payload) => {
+  return await User.findOne(payload);
+};
+
+const validateUser = async (data) => {
+  return validate(data);
+};
+
 module.exports = {
   createUser,
   findById,
   findAll,
   update,
   deleteUser,
+  findOne,
+  validateUser,
+  updateOne,
 };

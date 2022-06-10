@@ -3,7 +3,6 @@ const path = require("path");
 const methods = require("methods");
 const express = require("express");
 const bodyParser = require("body-parser");
-const session = require("express-session");
 const cors = require("cors");
 const passport = require("passport");
 const errorhandler = require("errorhandler");
@@ -24,15 +23,6 @@ app.use(bodyParser.json());
 
 app.use(require("method-override")());
 app.use(express.static(__dirname + "/public"));
-
-app.use(
-  session({
-    secret: "conduit",
-    cookie: { maxAge: 60000 },
-    resave: false,
-    saveUninitialized: false,
-  }),
-);
 
 if (!isProduction) {
   app.use(errorhandler());
@@ -86,6 +76,6 @@ app.use(function (err, req, res, next) {
 });
 
 // finally, let's start our server...
-var server = app.listen(process.env.PORT || 3000, function () {
+var server = app.listen(process.env.PORT || 5000, function () {
   console.log("Listening on port " + server.address().port);
 });
