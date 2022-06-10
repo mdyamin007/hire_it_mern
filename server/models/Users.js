@@ -41,16 +41,13 @@ UserSchema.methods.generateAuthToken = () => {
   const token = jwt.sign(
     {
       _id: this.id,
-      firstName: this.firstName,
-      lastName: this.lastName,
       email: this.email,
       password: this.password,
-      verified: this.verified,
     },
     process.env.JWTPRIVATEKEY,
     {
-      expiresIn: "1d",
-    },
+      expiresIn: "7d",
+    }
   );
   return token;
 };
@@ -62,7 +59,17 @@ const validate = (data) => {
     firstName: Joi.string().required().label("First Name"),
     lastName: Joi.string().required().label("Last Name"),
     email: Joi.string().email().required().label("Email"),
-    password: passwordComplexity().required().label("Password"),
+    password: passwordComplexity({
+      min: 8,
+      max: 26,
+      lowerCase: 1,
+      upperCase: 0,
+      numeric: 1,
+      symbol: 0,
+      requirementCount: 4,
+    })
+      .required()
+      .label("Password"),
     verified: Joi.boolean().default(false).label("Verified"),
   });
   return schema.validate(data);

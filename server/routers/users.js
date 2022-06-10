@@ -10,4 +10,6 @@ router
   .put(usersController.updateUser)
   .delete(usersController.deleteUser);
 
+router.route("/:userId/verify/:token").get(usersController.verifyUser);
+
 module.exports = router;
