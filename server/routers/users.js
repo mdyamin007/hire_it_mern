@@ -12,4 +12,6 @@ router
 
 router.route("/:userId/verify/:token").get(usersController.verifyUser);
 
+router.route("/login").post(usersController.loginUser);
+
 module.exports = router;

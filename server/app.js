@@ -8,6 +8,8 @@ const passport = require("passport");
 const errorhandler = require("errorhandler");
 const mongoose = require("mongoose");
 const userRouter = require("./routers/users");
+const cvRouter = require("./routers/cv");
+require("./config/passport");
 
 const isProduction = process.env.NODE_ENV === "production";
 
@@ -35,7 +37,13 @@ if (isProduction) {
   mongoose.set("debug", true);
 }
 
+// routes
 app.use("/api/v1/users", userRouter);
+app.use(
+  "/api/v1/cv",
+  passport.authenticate("jwt", { session: false }),
+  cvRouter
+);
 
 /// catch 404 and forward to error handler
 app.use(function (req, res, next) {

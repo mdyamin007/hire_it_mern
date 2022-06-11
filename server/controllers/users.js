@@ -125,6 +125,51 @@ const verifyUser = async (req, res) => {
   }
 };
 
+const loginUser = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    const user = await UserService.findOne({ email });
+
+    if (!user)
+      return res.status(400).send({ message: "Email is not registered" });
+
+    const compare = await user.isValidPassword(password);
+    if (!compare)
+      return res.status(400).send({ message: "Password is incorrect!" });
+
+    if (!user.verified) {
+      const foundToken = await TokenService.findOne({ userId: user._id });
+      if (foundToken) {
+        return res.status(400).send({
+          message:
+            "An email already has sent to your email. Please resend it again after 5 minutes",
+        });
+      }
+      const token = await TokenService.createToken({
+        userId: user._id,
+        token: crypto.randomBytes(32).toString("hex"),
+      });
+      const url = `http://localhost:5000/api/v1/users/${user._id}/verify/${token.token}`;
+      await sendEmail(user.email, "Verify Email", url);
+      return res
+        .status(400)
+        .send({ message: "An Email sent to your account please verify it" });
+    }
+
+    const token = await user.generateAuthToken();
+    res.status(200).send({
+      message: "Logged in successfully!",
+      userId: user._id,
+      userType: user.userType,
+      authToken: `Bearer ${token}`,
+    });
+  } catch (err) {
+    res.status(500).json({
+      message: err.message,
+    });
+  }
+};
+
 module.exports = {
   signUp,
   findAll,
@@ -132,4 +177,5 @@ module.exports = {
   updateUser,
   deleteUser,
   verifyUser,
+  loginUser,
 };

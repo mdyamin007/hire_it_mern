@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const Joi = require("joi");
 const jwt = require("jsonwebtoken");
 const passwordComplexity = require("joi-password-complexity");
+const bcrypt = require("bcrypt");
 
 const UserSchema = new mongoose.Schema({
   firstName: {
@@ -25,7 +26,14 @@ const UserSchema = new mongoose.Schema({
 
   verified: {
     type: Boolean,
+    required: true,
     default: false,
+  },
+
+  userType: {
+    type: String,
+    required: true,
+    default: "applicant",
   },
 });
 
@@ -37,7 +45,7 @@ UserSchema.set("toJSON", {
   virtuals: true,
 });
 
-UserSchema.methods.generateAuthToken = () => {
+UserSchema.methods.generateAuthToken = function () {
   const token = jwt.sign(
     {
       _id: this.id,
@@ -50,6 +58,10 @@ UserSchema.methods.generateAuthToken = () => {
     }
   );
   return token;
+};
+
+UserSchema.methods.isValidPassword = async function (password) {
+  return await bcrypt.compare(password, this.password);
 };
 
 const User = mongoose.model("User", UserSchema);
