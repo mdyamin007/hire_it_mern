@@ -10,12 +10,20 @@ const signUp = async (req, res) => {
     const { error } = UserService.validateUser(req.body);
     if (error)
       return res.status(400).send({ message: error.details[0].message });
+    if (!req.body.email && !req.body.password)
+      return res.status(400).send({ message: "User/Email must be given!" });
     const user = await UserService.findOne({ email: req.body.email });
-    if (user) return res.status(400).send("User already registered");
+    if (user) {
+      if (user.verified === true)
+        return res.status(400).send({ message: "User already registered" });
+      else
+        return res.status(400).send({ message: "Please check and verify your email" });
+    }
     if (req.body.verified === true)
       return res.status(400).send({
         message: "Don't try to manipulate the request, you noob hacker :D !",
       });
+
     const salt = await brypt.genSalt(10);
     const hashedPassword = await brypt.hash(req.body.password, salt);
     const newUser = await UserService.createUser({
@@ -105,21 +113,26 @@ const deleteUser = async (req, res) => {
 const verifyUser = async (req, res) => {
   try {
     const user = await UserService.findById(req.params.userId);
-    if (!user) res.status(400).send({ message: "invalid link" });
+
+    if (user && user.verified === true) {
+      return res.status(400).send({ message: "User already verified" })
+    }
+
+    if (!user) return res.status(400).send({ message: "invalid link" });
 
     const token = await TokenService.findOne({
       userId: user._id,
       token: req.params.token,
     });
 
-    if (!token) res.status(400).send({ message: "invalid link" });
+    if (!token) return res.status(400).send({ message: "invalid link" });
 
     await UserService.updateOne({ _id: user._id }, { verified: true });
     await TokenService.deleteToken(token._id);
 
-    res.status(200).send({ message: "Email verified successfully!" });
+    return res.status(200).send({ message: "Email verified successfully!" });
   } catch (err) {
-    res.status(500).json({
+    res.status(500).send({
       message: err.message,
     });
   }
