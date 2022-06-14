@@ -5,7 +5,7 @@ import Login from "./pages/login";
 import MainLayout from "./layouts/MainLayout";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import Verify from "./pages/verify";
+import Verification from "./pages/verification";
 
 function App() {
   return (
@@ -16,7 +16,7 @@ function App() {
             <Route index element={<Home />} />
             <Route path="/register" element={<Register />} />
             <Route path="/login" element={<Login />} />
-            <Route path="/verify" element={<Verify />} />
+            <Route path="/verify/:userId/:tokenId" element={<Verification />} />
           </Route>
         </Routes>
       </BrowserRouter>
