@@ -34,7 +34,7 @@ const signUp = async (req, res) => {
       userId: newUser._id,
       token: crypto.randomBytes(32).toString("hex"),
     });
-    const url = `http://localhost:5000/api/v1/users/${newUser._id}/verify/${token.token}`;
+    const url = `${process.env.CLIENT_URL}/verify/${newUser._id}/${token.token}`;
     await sendEmail(newUser.email, "Verify Email", url);
     res
       .status(201)

@@ -6,6 +6,7 @@ import Input from "../Elements/Input";
 import { register, reset } from "../../redux/features/authSlice";
 import { toast } from "react-toastify";
 import { validEmail, validPassword } from "../../utils/Regex";
+import Verify from "../Verification/verify";
 
 const RegisterForm = () => {
   const [newUser, setNewUser] = useState({
@@ -14,6 +15,7 @@ const RegisterForm = () => {
     email: "",
     password: "",
   });
+  const [emailSent, setEmailSent] = useState(false);
 
   const { user, isError, isSuccess, isLoading, message } = useSelector(
     (state) => state.auth
@@ -26,15 +28,19 @@ const RegisterForm = () => {
       toast.error(message);
     }
 
+    if (user) {
+      navigate("/")
+    }
+
     if (isSuccess) {
-      navigate("/verify");
+      setEmailSent(true);
       toast.success("Registered successfully!")
     }
 
-    return () => { dispatch(reset) }
-  }, [isError, message, isSuccess]);
+    return () => dispatch(reset)
+  }, [user, isError, message, isSuccess]);
 
-  console.log(newUser?.password);
+  // console.log(newUser?.password);
 
   const dispatch = useDispatch();
 
@@ -79,67 +85,69 @@ const RegisterForm = () => {
   };
 
   return (
-    <div className="bg-white w-1/3 shadow-md rounded px-8 pt-6 pb-8 flex flex-col mb-20">
-      <Input
-        id={"firstName"}
-        name={"firstName"}
-        type={"text"}
-        label={"First Name"}
-        placeholder={""}
-        onChange={handleInputChange}
-        value={newUser?.firstName}
-        required={true}
-      />
-      <Input
-        id={"lastName"}
-        name={"lastName"}
-        type={"text"}
-        label={"Last Name"}
-        placeholder={""}
-        onChange={handleInputChange}
-        value={newUser?.lastName}
-        required={true}
-
-      />
-      <Input
-        id={"email"}
-        name={"email"}
-        type={"email"}
-        label={"Email"}
-        placeholder={""}
-        onChange={handleInputChange}
-        value={newUser?.email}
-        required={true}
-
-      />
-      <Input
-        id={"password"}
-        name={"password"}
-        type={"password"}
-        label={"Password"}
-        placeholder={"********"}
-        onChange={handleInputChange}
-        value={newUser?.password}
-        required={true}
-
-      />
-      <div className="flex items-center justify-between">
-        <Button
-          bgColor={"bg-cyan-500"}
-          hoverColor={"hover:bg-cyan-600"}
-          text={"Sign up"}
-          textColor={"text-white"}
-          type={"button"}
-          onClick={handleSubmit}
-          disabled={isLoading}
+    <>
+      {emailSent ? <Verify /> : (<div className="bg-white w-1/3 shadow-md rounded px-8 pt-6 pb-8 flex flex-col mb-20">
+        <Input
+          id={"firstName"}
+          name={"firstName"}
+          type={"text"}
+          label={"First Name"}
+          placeholder={""}
+          onChange={handleInputChange}
+          value={newUser?.firstName}
+          required={true}
         />
-        <Link to="/login">
-          <p className="inline-block align-baseline font-bold text-sm text-blue hover:text-blue-700">
-            Already have an account? Log in
-          </p>
-        </Link>
-      </div>
-    </div>
+        <Input
+          id={"lastName"}
+          name={"lastName"}
+          type={"text"}
+          label={"Last Name"}
+          placeholder={""}
+          onChange={handleInputChange}
+          value={newUser?.lastName}
+          required={true}
+
+        />
+        <Input
+          id={"email"}
+          name={"email"}
+          type={"email"}
+          label={"Email"}
+          placeholder={""}
+          onChange={handleInputChange}
+          value={newUser?.email}
+          required={true}
+
+        />
+        <Input
+          id={"password"}
+          name={"password"}
+          type={"password"}
+          label={"Password"}
+          placeholder={"********"}
+          onChange={handleInputChange}
+          value={newUser?.password}
+          required={true}
+
+        />
+        <div className="flex items-center justify-between">
+          <Button
+            bgColor={"bg-cyan-500"}
+            hoverColor={"hover:bg-cyan-600"}
+            text={"Sign up"}
+            textColor={"text-white"}
+            type={"button"}
+            onClick={handleSubmit}
+            disabled={isLoading}
+          />
+          <Link to="/login">
+            <p className="inline-block align-baseline font-bold text-sm text-blue hover:text-blue-700">
+              Already have an account? Log in
+            </p>
+          </Link>
+        </div>
+      </div>)}
+    </>
   );
 };
 
