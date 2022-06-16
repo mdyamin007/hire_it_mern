@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useParams } from 'react-router-dom'
-import { verify } from '../redux/features/authSlice';
+import { reset, verify } from '../redux/features/authSlice';
 
 function Verification() {
     const [loading, setLoading] = useState(true);
@@ -14,7 +14,7 @@ function Verification() {
         if (isError) {
             setError(true);
         }
-
+        return () => dispatch(reset())
     }, [isError])
 
     useEffect(() => {
@@ -23,6 +23,8 @@ function Verification() {
             dispatch(verify({ userId, tokenId }))
             setLoading(false);
         }
+
+        return () => dispatch(reset())
     }, [])
 
 
