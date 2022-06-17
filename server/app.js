@@ -9,6 +9,8 @@ const errorhandler = require("errorhandler");
 const mongoose = require("mongoose");
 const userRouter = require("./routers/users");
 const cvRouter = require("./routers/cv");
+const companiesRouter = require("./routers/companies");
+const jobsRouter = require("./routers/jobDescription");
 require("./config/passport");
 
 const isProduction = process.env.NODE_ENV === "production";
@@ -42,8 +44,10 @@ app.use("/api/v1/users", userRouter);
 app.use(
   "/api/v1/cv",
   passport.authenticate("jwt", { session: false }),
-  cvRouter
+  cvRouter,
 );
+app.use("/api/v1/companies", companiesRouter);
+app.use("/api/v1/jobDescription", jobsRouter);
 
 /// catch 404 and forward to error handler
 app.use(function (req, res, next) {

@@ -1,15 +1,15 @@
 const mongoose = require("mongoose");
 
-const Job_DescriptionSchema = new mongoose.Schema({
+const CV_UploadSchema = new mongoose.Schema({
+  name: {
+    type: String,
+    required: true,
+  },
+  organization: {
+    type: String,
+    required: true,
+  },
   email: {
-    type: String,
-    required: true,
-  },
-  firstName: {
-    type: String,
-    required: true,
-  },
-  lastName: {
     type: String,
     required: true,
   },
@@ -17,51 +17,33 @@ const Job_DescriptionSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  cv: {
+  sectorOfJob: {
     type: String,
     required: true,
   },
-  country: {
-    type: String,
-    required: true,
-  },
-  city: {
-    type: String,
-    required: true,
-  },
-  nationality: {
-    type: String,
-    required: true,
-  },
-  industry: {
-    type: String,
-    required: true,
-  },
-  subIndustry: {
+  location: {
     type: String,
     required: true,
   },
 
-  sector: {
+  fileDescription: {
     type: String,
     required: true,
   },
-  subSector: {
+  detailsJobDescription: {
     type: String,
-    required: true,
-  },
-  currentSalary: {
-    type: Number,
     required: true,
   },
 });
 
-Job_DescriptionSchema.virtual("id").get(function () {
+CV_UploadSchema.virtual("id").get(function () {
   return this._id.toHexString();
 });
 
-Job_DescriptionSchema.set("toJSON", {
+CV_UploadSchema.set("toJSON", {
   virtuals: true,
 });
 
-module.exports = mongoose.model("Job_Description", Job_DescriptionSchema);
+const CV_Upload = mongoose.model("CV_Upload", CV_UploadSchema);
+
+module.exports = CV_Upload;
