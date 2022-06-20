@@ -1,9 +1,12 @@
 const express = require("express");
-const usersController = require("../controllers/users");
+const cvController = require("../controllers/cv_upload");
 const router = express.Router();
 
-router.route("/").get(async (req, res) => {
-  res.status(200).send("Working");
-});
+router.route("/").get(cvController.findAllCv).post(cvController.cvUpload);
+
+router
+  .route("/:userId")
+  .put(cvController.updateCv)
+  .delete(cvController.deleteCv);
 
 module.exports = router;

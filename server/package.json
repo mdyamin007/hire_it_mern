@@ -21,6 +21,7 @@
     "body-parser": "1.15.0",
     "cors": "2.7.1",
     "dotenv": "^16.0.1",
+    "dotnet": "^1.1.4",
     "ejs": "2.4.1",
     "errorhandler": "1.4.3",
     "express": "4.13.4",
