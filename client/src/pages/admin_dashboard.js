@@ -1,8 +1,9 @@
 import React from 'react'
+import DashboardAdmin from '../components/Admin/DashboardAdmin'
 
 function Admin_dashboard() {
     return (
-        <div>Admin_dashboard</div>
+        <DashboardAdmin />
     )
 }
 

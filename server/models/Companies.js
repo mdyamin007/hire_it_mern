@@ -1,12 +1,6 @@
 const mongoose = require("mongoose");
 
 const CompaniesSchema = new mongoose.Schema({
-  userId: {
-    type: mongoose.Schema.Types.ObjectId,
-    required: true,
-    ref: "Users",
-    unique: true,
-  },
   companyName: {
     type: String,
     required: true,
@@ -27,7 +21,6 @@ const CompaniesSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-
   companyDescription: {
     type: String,
     required: true,
