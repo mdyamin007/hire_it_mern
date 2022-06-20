@@ -21,21 +21,27 @@ const NavBar = () => {
           </h1>
         </Link>
       </div>
-      {user ? (<button onClick={handleLogout} className="py-3 px-5 bg-red-500 text-white rounded">
-        Log out
-      </button>) : (
-        <div className="flex space-x-3">
-          <Link to="/login">
-            <button className="py-3 px-5 bg-green-600 text-white rounded">
-              Login
-            </button>
-          </Link>
-          <Link to="/register">
-            <button className="py-3 px-5 bg-red-500 text-white rounded">
-              Register
-            </button>
-          </Link>
-        </div>)}
+      <div className="flex space-x-3">
+        {user && user.userType === "admin" && (<Link to="/admin_dashboard"><button className="py-3 px-5 bg-indigo-600 text-white rounded">
+          Dashboard
+        </button></Link>)}
+        {user ? (<button onClick={handleLogout} className="py-3 px-5 bg-red-500 text-white rounded">
+          Log out
+        </button>) : (
+          <>
+            <Link to="/login">
+              <button className="py-3 px-5 bg-green-600 text-white rounded">
+                Login
+              </button>
+            </Link>
+            <Link to="/register">
+              <button className="py-3 px-5 bg-red-500 text-white rounded">
+                Register
+              </button>
+            </Link>
+          </>
+        )}
+      </div>
     </nav>
   );
 };
