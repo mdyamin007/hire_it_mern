@@ -1,6 +1,8 @@
 const express = require("express");
 const comapniesController = require("../controllers/companies");
 const router = express.Router();
+const checkAdmin = require("../middlewares/checkAdmin")
+
 
 router
   .route("/")
