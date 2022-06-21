@@ -9,8 +9,7 @@ const api = axios.create({
   headers: {
     "Content-Type": "application/json",
     "Authorization": user.authToken,
-    "userType": user.userType,
-    "userId": user.userId
+    "user_id": user.userId
   },
 });
 
