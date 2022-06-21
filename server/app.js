@@ -11,6 +11,7 @@ const userRouter = require("./routers/users");
 const cvRouter = require("./routers/cv");
 const companiesRouter = require("./routers/companies");
 const jobsRouter = require("./routers/jobDescription");
+const checkAdmin = require("./middlewares/checkAdmin");
 require("./config/passport");
 
 const isProduction = process.env.NODE_ENV === "production";
@@ -50,7 +51,7 @@ app.use(
   passport.authenticate("jwt", { session: false }),
   cvRouter,
 );
-app.use("/api/v1/companies", companiesRouter);
+app.use("/api/v1/companies", checkAdmin, companiesRouter);
 app.use("/api/v1/jobDescription", jobsRouter);
 
 /// catch 404 and forward to error handler

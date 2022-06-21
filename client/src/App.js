@@ -7,7 +7,7 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Verification from "./pages/verification";
 import PrivateRouteAdmin from "./components/PrivateRouteAdmin";
-import Admin_dashboard from "./pages/admin_dashboard";
+import AdminDashboard from "./pages/admin_dashboard";
 import Companies from "./pages/companies";
 
 function App() {
@@ -21,7 +21,7 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/verify/:userId/:tokenId" element={<Verification />} />
             <Route element={<PrivateRouteAdmin />} >
-              <Route path="/admin_dashboard" element={<Admin_dashboard />} />
+              <Route path="/admin_dashboard" element={<AdminDashboard />} />
               <Route path="/companies" element={<Companies />} />
 
             </Route>

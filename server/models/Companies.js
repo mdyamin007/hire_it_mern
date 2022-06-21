@@ -19,11 +19,10 @@ const CompaniesSchema = new mongoose.Schema({
   },
   companyWebsite: {
     type: String,
-    required: true,
+
   },
   companyDescription: {
     type: String,
-    required: true,
   },
 });
 
