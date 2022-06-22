@@ -1,4 +1,4 @@
-const Job_Description = require("../models/Job_Description");
+const Job_Description = require("../models/JobPosts");
 
 const createJob_Description = async (jobDescription) => {
   return await Job_Description.create(jobDescription);
