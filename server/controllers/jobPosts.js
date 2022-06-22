@@ -21,7 +21,7 @@ const findAllJobDescriptions = async (req, res) => {
     const jobDescriptions = await JobPostService.findAllJob_Descriptions();
     res.status(200).json({
       message: "JobDescriptions fetched successfully",
-      jobDescriptions: jobDescriptions,
+      jobPosts: jobDescriptions,
     });
   } catch (err) {
     res.status(500).json({
