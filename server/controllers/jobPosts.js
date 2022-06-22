@@ -1,9 +1,9 @@
-const JobDesService = require("../services/jobDescription");
+const JobPostService = require("../services/jobPosts");
 
 const createJobDescription = async (req, res) => {
   try {
     const jobDescription = req.body;
-    const createdJobDescription = await JobDesService.createJob_Description(
+    const createdJobDescription = await JobPostService.createJob_Description(
       jobDescription,
     );
     res.status(201).json({
@@ -18,10 +18,10 @@ const createJobDescription = async (req, res) => {
 }; // end of createJobDescription
 const findAllJobDescriptions = async (req, res) => {
   try {
-    const jobDescriptions = await JobDesService.findAllJob_Descriptions();
+    const jobDescriptions = await JobPostService.findAllJob_Descriptions();
     res.status(200).json({
       message: "JobDescriptions fetched successfully",
-      jobDescriptions: jobDescriptions,
+      jobPosts: jobDescriptions,
     });
   } catch (err) {
     res.status(500).json({
@@ -32,7 +32,7 @@ const findAllJobDescriptions = async (req, res) => {
 const findJobDescriptionById = async (req, res) => {
   try {
     const jobDescriptionId = req.params.jobDescriptionId;
-    const jobDescription = await JobDesService.findJob_DescriptionById(
+    const jobDescription = await JobPostService.findJob_DescriptionById(
       jobDescriptionId,
     );
     res.status(200).json({
@@ -49,7 +49,7 @@ const updateJobDescription = async (req, res) => {
   try {
     const jobDescriptionId = req.params.jobDescriptionId;
     const jobDescription = req.body;
-    const updatedJobDescription = await JobDesService.updateJob_Description(
+    const updatedJobDescription = await JobPostService.updateJob_Description(
       jobDescriptionId,
       jobDescription,
     );
@@ -67,7 +67,7 @@ const updateJobDescription = async (req, res) => {
 const deleteJobDescription = async (req, res) => {
   try {
     const jobDescriptionId = req.params.jobDescriptionId;
-    const deletedJobDescription = await JobDesService.deleteJob_Description(
+    const deletedJobDescription = await JobPostService.deleteJob_Description(
       jobDescriptionId,
     );
     res.status(200).json({

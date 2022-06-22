@@ -9,6 +9,7 @@ import Verification from "./pages/verification";
 import PrivateRouteAdmin from "./components/PrivateRouteAdmin";
 import AdminDashboard from "./pages/admin_dashboard";
 import Companies from "./pages/companies";
+import JobPosts from "./pages/job_posts";
 
 function App() {
   return (
@@ -23,7 +24,7 @@ function App() {
             <Route element={<PrivateRouteAdmin />} >
               <Route path="/admin_dashboard" element={<AdminDashboard />} />
               <Route path="/companies" element={<Companies />} />
-
+              <Route path="/job_posts" element={<JobPosts />} />
             </Route>
           </Route>
         </Routes>

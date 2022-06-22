@@ -1,6 +1,3 @@
-const http = require("http");
-const path = require("path");
-const methods = require("methods");
 const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
@@ -10,7 +7,7 @@ const mongoose = require("mongoose");
 const userRouter = require("./routers/users");
 const cvRouter = require("./routers/cv");
 const companiesRouter = require("./routers/companies");
-const jobsRouter = require("./routers/jobDescription");
+const jobsRouter = require("./routers/jobPosts");
 const checkAdmin = require("./middlewares/checkAdmin");
 require("./config/passport");
 
@@ -52,7 +49,7 @@ app.use(
   cvRouter,
 );
 app.use("/api/v1/companies", checkAdmin, companiesRouter);
-app.use("/api/v1/jobDescription", jobsRouter);
+app.use("/api/v1/job_posts", jobsRouter);
 
 /// catch 404 and forward to error handler
 app.use(function (req, res, next) {
