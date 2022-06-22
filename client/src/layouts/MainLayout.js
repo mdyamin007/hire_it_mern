@@ -4,7 +4,7 @@ import NavBar from "../components/NavBar";
 
 const MainLayout = () => {
   return (
-    <main className="relative min-h-screen w-full">
+    <main className="relative min-h-screen overflow-auto w-full">
       <NavBar />
       <Outlet />
       <Footer />

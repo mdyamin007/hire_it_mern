@@ -4,7 +4,8 @@ import api from "../../api";
 
 
 const initialState = {
-    companies: []
+    companies: [],
+    message: ""
 };
 
 export const getAllCompanies = createAsyncThunk("companies/all", async (_, thunkAPI) => {
@@ -17,12 +18,25 @@ export const getAllCompanies = createAsyncThunk("companies/all", async (_, thunk
     }
 })
 
+export const setACompany = createAsyncThunk("companies/create", async (company, thunkAPI) => {
+    try {
+        const res = await api.post("api/v1/companies", company)
+        return res.data.message
+    } catch (error) {
+        console.log(error)
+        return thunkAPI.rejectWithValue(error.response.data);
+    }
+})
+
 const companiesSlice = createSlice({
     name: "companies",
     initialState,
     extraReducers: {
         [getAllCompanies.fulfilled]: (state, action) => {
             state.companies = action.payload;
+        },
+        [setACompany.fulfilled]: (state, action) => {
+            state.message = action.payload;
         }
     }
 })
