@@ -9,7 +9,7 @@ router
   .post(checkAdmin, jobPostController.createJobDescription);
 
 router
-  .route("/:jobDesId")
+  .route("/:jobDescriptionId")
   .get(jobPostController.findJobDescriptionById)
   .put(checkAdmin, jobPostController.updateJobDescription)
   .delete(checkAdmin, jobPostController.deleteJobDescription);
