@@ -10,6 +10,7 @@ import PrivateRouteAdmin from "./components/PrivateRouteAdmin";
 import AdminDashboard from "./pages/admin_dashboard";
 import Companies from "./pages/companies";
 import JobPosts from "./pages/job_posts";
+import JobDetails from "./pages/job_details";
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
             <Route path="/register" element={<Register />} />
             <Route path="/login" element={<Login />} />
             <Route path="/verify/:userId/:tokenId" element={<Verification />} />
+            <Route path="/job_details/:jobPostId" element={<JobDetails />} />
             <Route element={<PrivateRouteAdmin />} >
               <Route path="/admin_dashboard" element={<AdminDashboard />} />
               <Route path="/companies" element={<Companies />} />
