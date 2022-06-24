@@ -12,7 +12,7 @@ const JobList = () => {
 
     return (
         <div className="container mx-auto my-10">
-            <div className="flex my-10 space-x-10">
+            <div className="grid grid-cols-3 my-10 gap-4">
                 {job_posts &&
                     job_posts.map((jobPost) => (
                         <div key={jobPost._id} className="border rounded shadow-md p-20">

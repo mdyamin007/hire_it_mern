@@ -52,7 +52,7 @@ JobPostSchema.set("toJSON", {
 });
 
 const JobPost = mongoose.model(
-  "JobPost",
+  "Job_Posts",
   JobPostSchema,
 );
 
