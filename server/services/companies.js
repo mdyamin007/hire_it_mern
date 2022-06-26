@@ -11,11 +11,9 @@ const findAll = async () => {
 const findById = async (companyId) => {
   const foundComapny = await Companies.findById(companyId);
 
-  if (!foundComapny) {
-    throw new Error(`Company ${companyId} not found`);
-  }
   return foundComapny;
 };
+
 const updateCompany = async (companyId, company) => {
   const foundComapny = await Companies.findByIdAndUpdate(companyId, company);
   if (!foundComapny) {
