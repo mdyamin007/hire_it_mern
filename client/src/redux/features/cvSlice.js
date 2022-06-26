@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import api from "../../api";
+import apiAxios from "../../api";
 
 
 const initialState = {
@@ -14,9 +14,9 @@ const initialState = {
 
 export const uploadApplication = createAsyncThunk("cv/upload", async (formData, thunkAPI) => {
     try {
-        const res = await api.post("api/v1/cv", formData);
+        const res = await apiAxios("api/v1/cv", "POST", formData);
         console.log(res);
-        return res.data
+        return res
     } catch (error) {
         console.log(error)
         return thunkAPI.rejectWithValue(error.response.data);
@@ -25,8 +25,8 @@ export const uploadApplication = createAsyncThunk("cv/upload", async (formData, 
 
 export const getAllApplications = createAsyncThunk("cv/all", async (_, thunkAPI) => {
     try {
-        const res = await api.get("api/v1/cv");
-        return res.data
+        const res = await apiAxios("api/v1/cv");
+        return res
     } catch (error) {
         console.log(error)
         return thunkAPI.rejectWithValue(error.response.data);
@@ -35,8 +35,8 @@ export const getAllApplications = createAsyncThunk("cv/all", async (_, thunkAPI)
 
 export const getApplicantDetailsById = createAsyncThunk("cv/findById", async (applicantId, thunkAPI) => {
     try {
-        const res = await api.get("api/v1/cv/" + applicantId);
-        return res.data
+        const res = await apiAxios("api/v1/cv/" + applicantId);
+        return res
     } catch (error) {
         console.log(error)
         return thunkAPI.rejectWithValue(error.response.data);

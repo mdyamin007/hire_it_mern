@@ -9,8 +9,6 @@ import Input from "../Elements/Input";
 const LoginForm = () => {
 
   const [newUser, setNewUser] = useState({
-    firstName: "",
-    lastName: "",
     email: "",
     password: "",
   });

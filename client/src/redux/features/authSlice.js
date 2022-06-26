@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import api from "../../api";
+import apiAxios, { BASE_URL } from "../../api";
 
 const user = JSON.parse(localStorage.getItem("user"))
 
@@ -14,10 +14,17 @@ const initialState = {
 
 export const register = createAsyncThunk(
   "auth/register",
-  async (user, thunkAPI) => {
+  async (userData, thunkAPI) => {
     try {
-      const res = await api.post("api/v1/users", user);
-      return res.data;
+      const res = await fetch(`${BASE_URL}/api/v1/users/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(userData),
+      })
+      const data = await res.json();
+      return data
     } catch (error) {
       console.log(error);
       return thunkAPI.rejectWithValue(error.response.data);
@@ -29,8 +36,9 @@ export const verify = createAsyncThunk(
   "auth/verify",
   async (userInfo, thunkAPI) => {
     try {
-      const res = await api.get(`api/v1/users/${userInfo.userId}/verify/${userInfo.tokenId}`)
-      return res.data;
+      const res = await fetch(`${BASE_URL}/api/v1/users/${userInfo.userId}/verify/${userInfo.tokenId}`)
+      const data = await res.json();
+      return data;
     } catch (error) {
       console.log(error);
       return thunkAPI.rejectWithValue(error.response.data);
@@ -40,13 +48,20 @@ export const verify = createAsyncThunk(
 
 export const login = createAsyncThunk("auth/login", async (userData, thunkAPI) => {
   try {
-    const res = await api.post("api/v1/users/login", userData);
-    const { userId, userType, authToken } = res.data;
+    const res = await fetch(`${BASE_URL}/api/v1/users/login`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(userData),
+    })
+    const data = await res.json();
+    const { userId, userType, authToken } = data;
     const user = {
       userId, userType, authToken
     }
     localStorage.setItem("user", JSON.stringify(user));
-    return res.data;
+    return data;
   } catch (error) {
     console.log(error);
     return thunkAPI.rejectWithValue(error.response.data);
@@ -56,7 +71,7 @@ export const login = createAsyncThunk("auth/login", async (userData, thunkAPI) =
 export const logout = createAsyncThunk("auth/logout", async (_, thunkAPI) => {
   console.log(thunkAPI)
   thunkAPI.dispatch(reset())
-  await localStorage.removeItem("user")
+  localStorage.removeItem("user")
 })
 
 const authSlice = createSlice({
@@ -78,12 +93,12 @@ const authSlice = createSlice({
       state.isLoading = false;
       state.isSuccess = true;
       state.isError = false;
-      state.message = action.payload.message;
+      state.message = "failed";
     },
     [register.rejected]: (state, action) => {
       state.isLoading = false;
       state.isError = true;
-      state.message = action.payload.message;
+      state.message = "failed";
     },
     [verify.pending]: (state) => {
       state.isLoading = true;
@@ -91,12 +106,12 @@ const authSlice = createSlice({
     [verify.fulfilled]: (state, action) => {
       state.isLoading = false;
       state.isError = false;
-      state.message = action.payload.message;
+      state.message = "failed";
     },
     [verify.rejected]: (state, action) => {
       state.isLoading = false;
       state.isError = true;
-      state.message = action.payload.message;
+      state.message = "failed";
     },
     [login.pending]: (state) => {
       state.isLoading = true;
@@ -105,7 +120,7 @@ const authSlice = createSlice({
       state.isLoading = false;
       state.isSuccess = true;
       state.isError = false;
-      state.message = action.payload.message;
+      state.message = "failed";
       state.user = {
         userId: action.payload.userId,
         userType: action.payload.userType,
@@ -115,7 +130,7 @@ const authSlice = createSlice({
     [login.rejected]: (state, action) => {
       state.isLoading = false;
       state.isError = true;
-      state.message = action.payload.message;
+      state.message = "failed";
     },
     [logout.fulfilled]: (state) => {
       state.user = null;

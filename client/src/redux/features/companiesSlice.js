@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import api from "../../api";
+import apiAxios from "../../api";
 
 
 
@@ -10,8 +10,8 @@ const initialState = {
 
 export const getAllCompanies = createAsyncThunk("companies/all", async (_, thunkAPI) => {
     try {
-        const res = await api.get("api/v1/companies")
-        return res.data.companies
+        const res = await apiAxios("api/v1/companies")
+        return res.companies
     } catch (error) {
         console.log(error)
         return thunkAPI.rejectWithValue(error.response.data);
@@ -20,8 +20,8 @@ export const getAllCompanies = createAsyncThunk("companies/all", async (_, thunk
 
 export const setACompany = createAsyncThunk("companies/create", async (company, thunkAPI) => {
     try {
-        const res = await api.post("api/v1/companies", company)
-        return res.data.message
+        const res = await apiAxios("api/v1/companies", "POST", company)
+        return res.message
     } catch (error) {
         console.log(error)
         return thunkAPI.rejectWithValue(error.response.data);
