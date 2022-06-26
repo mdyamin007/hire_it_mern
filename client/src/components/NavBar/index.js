@@ -21,6 +21,11 @@ const NavBar = () => {
           </h1>
         </Link>
       </div>
+      <nav>
+        <Link to="/submit_cv">
+          <p className="text-white">Submit CV</p>
+        </Link>
+      </nav>
       <div className="flex space-x-3">
         {user && user.userType === "admin" && (<Link to="/admin_dashboard"><button className="py-3 px-5 bg-indigo-600 text-white rounded">
           Dashboard

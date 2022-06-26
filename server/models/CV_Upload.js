@@ -1,11 +1,11 @@
 const mongoose = require("mongoose");
 
 const CV_UploadSchema = new mongoose.Schema({
-  name: {
+  firstName: {
     type: String,
     required: true,
   },
-  organization: {
+  lastName: {
     type: String,
     required: true,
   },
@@ -17,23 +17,46 @@ const CV_UploadSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  sectorOfJob: {
+  cv: {
     type: String,
     required: true,
   },
-  location: {
+  country: {
     type: String,
     required: true,
   },
-
-  fileDescription: {
+  city: {
     type: String,
     required: true,
   },
-  detailsJobDescription: {
+  nationality: {
     type: String,
     required: true,
   },
+  industry: {
+    type: String,
+    required: true,
+  },
+  subIndustry: {
+    type: String,
+    required: true,
+  },
+  sector: {
+    type: String,
+    required: true,
+  },
+  subSector: {
+    type: String,
+    required: true,
+  },
+  currentSalary: {
+    type: String,
+    required: true,
+  },
+  certifications: {
+    type: String,
+    required: true,
+  }
 });
 
 CV_UploadSchema.virtual("id").get(function () {

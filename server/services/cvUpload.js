@@ -1,7 +1,7 @@
-const { CV_Upload } = require("../models/CV_Upload");
+const CV_Upload = require("../models/CV_Upload");
 
 const upLoadCv = async (cv) => {
-  return await CV_Upload.save(cv);
+  return await CV_Upload.create(cv);
 };
 
 const findAllCv = async () => {
