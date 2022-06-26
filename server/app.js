@@ -4,6 +4,7 @@ const cors = require("cors");
 const passport = require("passport");
 const errorhandler = require("errorhandler");
 const mongoose = require("mongoose");
+
 const userRouter = require("./routers/users");
 const cvRouter = require("./routers/cv");
 const companiesRouter = require("./routers/companies");
@@ -15,6 +16,7 @@ const isProduction = process.env.NODE_ENV === "production";
 
 // Create global app object
 const app = express();
+
 
 app.use(
   cors({
@@ -46,10 +48,11 @@ app.use("/api/v1/users", userRouter);
 app.use(
   "/api/v1/cv",
   passport.authenticate("jwt", { session: false }),
-  cvRouter,
+  cvRouter
 );
 app.use("/api/v1/companies", checkAdmin, companiesRouter);
 app.use("/api/v1/job_posts", jobsRouter);
+
 
 /// catch 404 and forward to error handler
 app.use(function (req, res, next) {

@@ -2,7 +2,11 @@ const CV_UploadService = require("../services/cvUpload");
 
 const cvUpload = async (req, res) => {
   try {
-    const cv = req.body;
+    let cv = req.body;
+    cv = {
+      ...cv,
+      cv: req.file.path
+    }
     const createdCv = await CV_UploadService.upLoadCv(cv);
     res.status(201).json({
       message: "CV created successfully",
