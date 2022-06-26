@@ -2,6 +2,7 @@ const express = require("express");
 const cvController = require("../controllers/cv_upload");
 const router = express.Router();
 const multer = require("multer")
+const checkAdmin = require("../middlewares/checkAdmin")
 
 
 const storage = multer.diskStorage({
@@ -15,7 +16,7 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage })
 
-router.route("/").get(cvController.findAllCv).post(upload.single('cv'), cvController.cvUpload);
+router.route("/").get(checkAdmin, cvController.findAllCv).post(upload.single('cv'), cvController.cvUpload);
 
 router
   .route("/:userId")
