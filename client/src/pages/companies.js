@@ -50,6 +50,7 @@ const AddNewCompany = ({ setOpenAddModal }) => {
         if (newCompany) {
             try {
                 await dispatch(setACompany(newCompany))
+                toast.success("Successfully added!")
                 navigate("/admin_dashboard")
             } catch (error) {
                 console.log(error)

@@ -14,7 +14,7 @@ const initialState = {
 
 export const uploadApplication = createAsyncThunk("cv/upload", async (formData, thunkAPI) => {
     try {
-        const res = await apiAxios("api/v1/cv", "POST", formData);
+        const res = await apiAxios("/api/v1/cv", "POST", formData);
         console.log(res);
         return res
     } catch (error) {
@@ -25,7 +25,7 @@ export const uploadApplication = createAsyncThunk("cv/upload", async (formData, 
 
 export const getAllApplications = createAsyncThunk("cv/all", async (_, thunkAPI) => {
     try {
-        const res = await apiAxios("api/v1/cv");
+        const res = await apiAxios("/api/v1/cv");
         return res
     } catch (error) {
         console.log(error)
@@ -35,7 +35,7 @@ export const getAllApplications = createAsyncThunk("cv/all", async (_, thunkAPI)
 
 export const getApplicantDetailsById = createAsyncThunk("cv/findById", async (applicantId, thunkAPI) => {
     try {
-        const res = await apiAxios("api/v1/cv/" + applicantId);
+        const res = await apiAxios("/api/v1/cv/" + applicantId);
         return res
     } catch (error) {
         console.log(error)
