@@ -10,7 +10,7 @@ const initialState = {
 
 export const getAllCompanies = createAsyncThunk("companies/all", async (_, thunkAPI) => {
     try {
-        const res = await apiAxios("api/v1/companies")
+        const res = await apiAxios("/api/v1/companies")
         return res.companies
     } catch (error) {
         console.log(error)
@@ -20,7 +20,7 @@ export const getAllCompanies = createAsyncThunk("companies/all", async (_, thunk
 
 export const setACompany = createAsyncThunk("companies/create", async (company, thunkAPI) => {
     try {
-        const res = await apiAxios("api/v1/companies", "POST", company)
+        const res = await apiAxios("/api/v1/companies", "POST", company)
         return res.message
     } catch (error) {
         console.log(error)

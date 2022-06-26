@@ -12,7 +12,7 @@ const initialState = {
 
 export const getAllJobPosts = createAsyncThunk("jobs/all", async (_, thunkAPI) => {
     try {
-        const res = await apiAxios("api/v1/job_posts")
+        const res = await apiAxios("/api/v1/job_posts")
         return res.jobPosts
     } catch (error) {
         console.log(error)
@@ -22,7 +22,7 @@ export const getAllJobPosts = createAsyncThunk("jobs/all", async (_, thunkAPI) =
 
 export const getAJobPostByID = createAsyncThunk("jobs/id", async (id, thunkAPI) => {
     try {
-        const res = await api.Axios(`api/v1/job_posts/${id}`)
+        const res = await api.Axios(`/api/v1/job_posts/${id}`)
         return res.jobDescription
     } catch (error) {
         console.log(error)
@@ -32,7 +32,7 @@ export const getAJobPostByID = createAsyncThunk("jobs/id", async (id, thunkAPI) 
 
 export const createAJobPost = createAsyncThunk("jobs/create", async (data, thunkAPI) => {
     try {
-        const res = await apiAxios("api/v1/job_posts", "POST", data)
+        const res = await apiAxios("/api/v1/job_posts", "POST", data)
         return res.message
     } catch (error) {
         console.log(error)
