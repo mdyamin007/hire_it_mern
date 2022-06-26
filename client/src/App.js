@@ -11,6 +11,8 @@ import AdminDashboard from "./pages/admin_dashboard";
 import Companies from "./pages/companies";
 import JobPosts from "./pages/job_posts";
 import JobDetails from "./pages/job_details";
+import PrivateRouteUser from "./components/PrivateRouteUser";
+import Submit_cv from "./pages/submit_cv";
 
 function App() {
   return (
@@ -23,6 +25,9 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/verify/:userId/:tokenId" element={<Verification />} />
             <Route path="/job_details/:jobPostId" element={<JobDetails />} />
+            <Route element={<PrivateRouteUser />} >
+              <Route path="submit_cv" element={<Submit_cv />} />
+            </Route>
             <Route element={<PrivateRouteAdmin />} >
               <Route path="/admin_dashboard" element={<AdminDashboard />} />
               <Route path="/companies" element={<Companies />} />

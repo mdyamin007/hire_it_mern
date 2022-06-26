@@ -1,7 +1,8 @@
 import { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { useParams } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 import { getAJobPostByID } from '../redux/features/jobSlice'
+import Button from "../components/Elements/Button"
 
 function JobDetails() {
 
@@ -16,7 +17,7 @@ function JobDetails() {
 
 
     return (
-        <div className="flex justify-center items-center min-h-screen">
+        <div className="flex flex-col justify-center items-center min-h-screen">
             <div className='border rounded-md shadow-md w-3/4 p-20'>
                 <h1 className="text-4xl font-semibold italic text-gray-700">
                     {job_post.position}
@@ -33,6 +34,11 @@ function JobDetails() {
                 </h1>
                 <p>{job_post.jobDescription}</p> <br /><br /><br />
                 <p>Consultant: {job_post.consultantName}</p>
+            </div>
+            <div className="flex container mx-auto items-end justify-end px-20 my-4">
+                <Link to="/submit_cv">
+                    <Button bgColor={"bg-blue-500"} hoverColor={"hover:bg-blue-600"} text={"Apply"} type={"button"} textColor={"text-white"} />
+                </Link>
             </div>
         </div>
     )
