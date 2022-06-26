@@ -4,6 +4,7 @@ import api from "../../api";
 
 const initialState = {
     applications: [],
+    applicantDetails: {},
     data: {},
     isError: false,
     isSuccess: false,
@@ -32,6 +33,16 @@ export const getAllApplications = createAsyncThunk("cv/all", async (_, thunkAPI)
     }
 })
 
+export const getApplicantDetailsById = createAsyncThunk("cv/findById", async (applicantId, thunkAPI) => {
+    try {
+        const res = await api.get("api/v1/cv/" + applicantId);
+        return res.data
+    } catch (error) {
+        console.log(error)
+        return thunkAPI.rejectWithValue(error.response.data);
+    }
+})
+
 const cvSlice = createSlice({
     name: "cv",
     initialState,
@@ -52,6 +63,10 @@ const cvSlice = createSlice({
         },
         [getAllApplications.fulfilled]: (state, action) => {
             state.applications = action.payload.cv
+            state.message = action.payload.message
+        },
+        [getApplicantDetailsById.fulfilled]: (state, action) => {
+            state.applicantDetails = action.payload.cv
             state.message = action.payload.message
         }
     }

@@ -5,6 +5,8 @@ import Button from "../Elements/Button";
 import Select from "react-select";
 import { useDispatch } from "react-redux"
 import { uploadApplication } from "../../redux/features/cvSlice";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify"
 
 const ApplicationForm = () => {
 
@@ -12,6 +14,7 @@ const ApplicationForm = () => {
     const [cv, setCv] = useState()
 
     const dispatch = useDispatch()
+    const navigate = useNavigate()
 
     const industryOptions = [
         { value: "business_services", label: "Business Services" },
@@ -57,6 +60,8 @@ const ApplicationForm = () => {
         }
         formData.append("cv", cv);
         dispatch(uploadApplication(formData))
+        toast.success("Submitted successfully!")
+        navigate("/")
     }
 
     return (
