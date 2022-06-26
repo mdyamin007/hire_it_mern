@@ -183,6 +183,14 @@ const ApplicationForm = () => {
                     type={"text"}
                     onChange={handleInputChange}
                 />
+                <Input
+                    id={"skills"}
+                    name={"skills"}
+                    label={"Skills"}
+                    required={true}
+                    type={"text"}
+                    onChange={handleInputChange}
+                />
                 <div className="flex items-center justify-center">
                     <Button bgColor={"bg-blue-500"} hoverColor={"hover:bg-blue-600"} text={"Apply"} textColor={"text-white"} type={"submit"} />
                 </div>

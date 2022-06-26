@@ -46,6 +46,10 @@ function ApplicationDetails() {
                         Certifications
                     </h1>
                     <p>{applicantDetails.certifications}</p> <br />
+                    <h1 className="text-4xl mt-10 font-semibold text-gray-700">
+                        Skills
+                    </h1>
+                    <p>{applicantDetails.skills}</p> <br />
                     <br />
                     <br />
                     <p>Current Salary: {applicantDetails.currentSalary}</p>

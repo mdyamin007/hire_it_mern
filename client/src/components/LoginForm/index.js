@@ -9,8 +9,6 @@ import Input from "../Elements/Input";
 const LoginForm = () => {
 
   const [newUser, setNewUser] = useState({
-    firstName: "",
-    lastName: "",
     email: "",
     password: "",
   });
@@ -31,7 +29,6 @@ const LoginForm = () => {
     if (user || isSuccess) {
       if (user.userType === "admin") navigate("/admin_dashboard")
       else navigate("/")
-      toast.success("Logged in successfully!")
     }
 
     return () => dispatch(reset())

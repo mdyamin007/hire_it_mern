@@ -25,7 +25,7 @@ function Verification() {
         }
 
         return () => dispatch(reset())
-    }, [])
+    }, [userId, tokenId])
 
 
     return (
@@ -38,7 +38,7 @@ function Verification() {
                 </div>) : (
                     <div className='flex justify-center items-center min-h-screen w-full'>
                         <div className='bg-green-400 p-20 text-white text-lg font-semibold shadow-md text-center w-1/4 rounded'>
-                            <p>Email successfully verified. Please <Link to="/login"><span className='text-blue-600'>login</span></Link> here</p>
+                            <p>Email successfully verified. Please login</p>
                         </div>
                     </div>)}
                 </>)}

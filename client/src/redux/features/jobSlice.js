@@ -1,4 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import apiAxios from "../../api";
 import api from "../../api";
 
 
@@ -11,8 +12,8 @@ const initialState = {
 
 export const getAllJobPosts = createAsyncThunk("jobs/all", async (_, thunkAPI) => {
     try {
-        const res = await api.get("api/v1/job_posts")
-        return res.data.jobPosts
+        const res = await apiAxios("api/v1/job_posts")
+        return res.jobPosts
     } catch (error) {
         console.log(error)
         return thunkAPI.rejectWithValue(error.response.data);
@@ -21,8 +22,8 @@ export const getAllJobPosts = createAsyncThunk("jobs/all", async (_, thunkAPI) =
 
 export const getAJobPostByID = createAsyncThunk("jobs/id", async (id, thunkAPI) => {
     try {
-        const res = await api.get(`api/v1/job_posts/${id}`)
-        return res.data.jobDescription
+        const res = await api.Axios(`api/v1/job_posts/${id}`)
+        return res.jobDescription
     } catch (error) {
         console.log(error)
         return thunkAPI.rejectWithValue(error.response.data);
@@ -31,8 +32,8 @@ export const getAJobPostByID = createAsyncThunk("jobs/id", async (id, thunkAPI) 
 
 export const createAJobPost = createAsyncThunk("jobs/create", async (data, thunkAPI) => {
     try {
-        const res = await api.post("api/v1/job_posts", data)
-        return res.data.message
+        const res = await apiAxios("api/v1/job_posts", "POST", data)
+        return res.message
     } catch (error) {
         console.log(error)
         return thunkAPI.rejectWithValue(error.response.data);
