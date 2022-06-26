@@ -14,6 +14,7 @@ import JobDetails from "./pages/job_details";
 import PrivateRouteUser from "./components/PrivateRouteUser";
 import Submit_cv from "./pages/submit_cv";
 import Applications from "./pages/applications";
+import ApplicationDetails from "./pages/application_details";
 
 function App() {
   return (
@@ -34,6 +35,8 @@ function App() {
               <Route path="/companies" element={<Companies />} />
               <Route path="/job_posts" element={<JobPosts />} />
               <Route path="/applications" element={<Applications />} />
+              <Route path="/applications/:applicationId" element={<ApplicationDetails />} />
+
             </Route>
           </Route>
         </Routes>

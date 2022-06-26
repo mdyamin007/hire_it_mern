@@ -35,9 +35,9 @@ const findAllCv = async (req, res) => {
 
 const updateCv = async (req, res) => {
   try {
-    const cvId = req.params.cvId;
+    const applicationId = req.params.applicationId;
     const cv = req.body;
-    const updatedCv = await CV_UploadService.updateCv(cvId, cv);
+    const updatedCv = await CV_UploadService.updateCv(applicationId, cv);
     res.status(200).json({
       message: "CV updated successfully",
       cv: updatedCv,
@@ -51,11 +51,26 @@ const updateCv = async (req, res) => {
 
 const deleteCv = async (req, res) => {
   try {
-    const cvId = req.params.cvId;
-    const deletedCv = await CV_UploadService.deleteCv(cvId);
+    const applicationId = req.params.applicationId;
+    const deletedCv = await CV_UploadService.deleteCv(applicationId);
     res.status(200).json({
       message: "CV deleted successfully",
       cv: deletedCv,
+    });
+  } catch (err) {
+    res.status(500).json({
+      message: err.message,
+    });
+  }
+};
+
+const findById = async (req, res) => {
+  try {
+    const applicationId = req.params.applicationId;
+    const data = await CV_UploadService.findById(applicationId);
+    res.status(200).json({
+      message: "CV fetched successfully",
+      cv: data,
     });
   } catch (err) {
     res.status(500).json({
@@ -69,4 +84,5 @@ module.exports = {
   findAllCv,
   updateCv,
   deleteCv,
+  findById
 };

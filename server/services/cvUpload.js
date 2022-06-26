@@ -11,19 +11,21 @@ const findAllCv = async () => {
 const updateCv = async (cvId, cv) => {
   const foundCv = await CV_Upload.findByIdAndUpdate(cvId, cv, { new: true });
 
-  if (!foundCv) {
-    throw new Error(`CV ${cvId} not found`);
-  }
+
   return foundCv;
 };
 
 const deleteCv = async (cvId) => {
   const foundCv = await CV_Upload.findByIdAndDelete(cvId);
 
-  if (!foundCv) {
-    throw new Error(`CV ${cvId} not found`);
-  }
+
   return foundCv;
+};
+
+const findById = async (applicationId) => {
+  const foundComapny = await CV_Upload.findById(applicationId);
+
+  return foundComapny;
 };
 
 module.exports = {
@@ -31,4 +33,5 @@ module.exports = {
   findAllCv,
   updateCv,
   deleteCv,
+  findById,
 };

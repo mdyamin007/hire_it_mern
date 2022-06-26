@@ -19,7 +19,8 @@ const upload = multer({ storage: storage })
 router.route("/").get(checkAdmin, cvController.findAllCv).post(upload.single('cv'), cvController.cvUpload);
 
 router
-  .route("/:userId")
+  .route("/:applicationId")
+  .get(cvController.findById)
   .put(cvController.updateCv)
   .delete(cvController.deleteCv);
 
