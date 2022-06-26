@@ -162,7 +162,7 @@ const loginUser = async (req, res) => {
         userId: user._id,
         token: crypto.randomBytes(32).toString("hex"),
       });
-      const url = `http://localhost:5000/api/v1/users/${user._id}/verify/${token.token}`;
+      const url = `${process.env.CLIENT_URL}/verify/${user._id}/${token.token}`;
       await sendEmail(user.email, "Verify Email", url);
       return res
         .status(400)

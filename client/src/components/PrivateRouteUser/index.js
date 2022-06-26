@@ -7,7 +7,7 @@ function PrivateRouteUser() {
 
     return (
         <>
-            {user ? <Outlet /> : <Navigate to={"/"} />}
+            {user ? <Outlet /> : <Navigate to={"/login"} />}
         </>
     )
 }

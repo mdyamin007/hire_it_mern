@@ -90,7 +90,6 @@ const authSlice = createSlice({
     },
     [verify.fulfilled]: (state, action) => {
       state.isLoading = false;
-      state.isSuccess = true;
       state.isError = false;
       state.message = action.payload.message;
     },
