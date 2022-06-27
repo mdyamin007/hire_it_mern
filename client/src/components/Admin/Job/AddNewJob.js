@@ -6,9 +6,11 @@ import { createAJobPost } from "../../../redux/features/jobSlice";
 import Button from "../../Elements/Button";
 import FormTitle from "../../Elements/FormTitle";
 import Input from "../../Elements/Input";
+import Select from "react-select"
 
 const AddNewJob = ({ setOpenAddModal }) => {
     const [newJobPost, setNewJobPost] = useState();
+    const [companiesOptions, setCompaniesOptions] = useState()
 
     const dispatch = useDispatch();
     const { companies } = useSelector((state) => state.companies);
@@ -17,11 +19,22 @@ const AddNewJob = ({ setOpenAddModal }) => {
         dispatch(getAllCompanies())
     }, []);
 
+    useEffect(() => {
+        if (companies) {
+            setCompaniesOptions(companies.map(company => ({ label: company.companyName, value: company._id })))
+        }
+    }, [companies])
+
+
     const handleInputChange = (e) => {
         if (e.target.value) {
             setNewJobPost((prev) => ({ ...prev, [e.target.name]: e.target.value }));
         }
     };
+
+    const handleSelectChange = (option) => {
+        setNewJobPost(prev => ({ ...prev, companyId: option.value }))
+    }
 
     const handleSubmit = async () => {
         if (newJobPost) {
@@ -53,9 +66,23 @@ const AddNewJob = ({ setOpenAddModal }) => {
                     type={"text"}
                     onChange={handleInputChange}
                 />
+                <div className="my-4">
+                    <label
+                        className="block text-gray-900 text-sm font-bold mb-2"
+                    >
+                        Company name
+                    </label>
+                    <Select
+                        options={companiesOptions}
+                        name={"companyId"}
+                        className="basic-multi-select"
+                        classNamePrefix="select"
+                        onChange={handleSelectChange}
+                    />
+                </div>
                 <Input
                     id={"location"}
-                    label={"Company address"}
+                    label={"Location"}
                     name={"location"}
                     required={true}
                     type={"text"}
