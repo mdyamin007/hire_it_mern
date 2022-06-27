@@ -1,7 +1,8 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import apiAxios, { BASE_URL } from "../../api";
+import axios from "axios";
+import { BASE_URL } from "../../api";
 
-const user = JSON.parse(localStorage.getItem("user"))
+const user = JSON.parse(localStorage.getItem("user"));
 
 const initialState = {
   user: user ? user : null,
@@ -11,20 +12,12 @@ const initialState = {
   message: "",
 };
 
-
 export const register = createAsyncThunk(
   "auth/register",
   async (userData, thunkAPI) => {
     try {
-      const res = await fetch(`${BASE_URL}/api/v1/users/`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(userData),
-      })
-      const data = await res.json();
-      return data
+      const res = await axios.post(`${BASE_URL}/api/v1/users/`, userData)
+      return res.data;
     } catch (error) {
       console.log(error);
       return thunkAPI.rejectWithValue(error.response.data);
@@ -36,9 +29,8 @@ export const verify = createAsyncThunk(
   "auth/verify",
   async (userInfo, thunkAPI) => {
     try {
-      const res = await fetch(`${BASE_URL}/api/v1/users/${userInfo.userId}/verify/${userInfo.tokenId}`)
-      const data = await res.json();
-      return data;
+      const res = await axios.get(`${BASE_URL}/api/v1/users/${userInfo.userId}/verify/${userInfo.tokenId}`);
+      return res.data;
     } catch (error) {
       console.log(error);
       return thunkAPI.rejectWithValue(error.response.data);
@@ -46,33 +38,33 @@ export const verify = createAsyncThunk(
   }
 );
 
-export const login = createAsyncThunk("auth/login", async (userData, thunkAPI) => {
-  try {
-    const res = await fetch(`${BASE_URL}/api/v1/users/login`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(userData),
-    })
-    const data = await res.json();
-    const { userId, userType, authToken } = data;
-    const user = {
-      userId, userType, authToken
+export const login = createAsyncThunk(
+  "auth/login",
+  async (userData, thunkAPI) => {
+    try {
+      const res = await axios.post(`${BASE_URL}/api/v1/users/login`, userData, {
+        headers: { "Content-Type": "application/json" },
+      });
+      const { userId, userType, authToken } = res.data;
+      const user = {
+        userId,
+        userType,
+        authToken,
+      };
+      localStorage.setItem("user", JSON.stringify(user));
+      return res.data;
+    } catch (error) {
+      console.log(error);
+      return thunkAPI.rejectWithValue(error.response.data);
     }
-    localStorage.setItem("user", JSON.stringify(user));
-    return data;
-  } catch (error) {
-    console.log(error);
-    return thunkAPI.rejectWithValue(error.response.data);
   }
-})
+);
 
 export const logout = createAsyncThunk("auth/logout", async (_, thunkAPI) => {
-  console.log(thunkAPI)
-  thunkAPI.dispatch(reset())
-  localStorage.removeItem("user")
-})
+  console.log(thunkAPI);
+  thunkAPI.dispatch(reset());
+  localStorage.removeItem("user");
+});
 
 const authSlice = createSlice({
   name: "auth",
@@ -93,12 +85,12 @@ const authSlice = createSlice({
       state.isLoading = false;
       state.isSuccess = true;
       state.isError = false;
-      state.message = "failed";
+      state.message = action.payload.message;
     },
     [register.rejected]: (state, action) => {
       state.isLoading = false;
       state.isError = true;
-      state.message = "failed";
+      state.message = action.payload.message;
     },
     [verify.pending]: (state) => {
       state.isLoading = true;
@@ -106,12 +98,12 @@ const authSlice = createSlice({
     [verify.fulfilled]: (state, action) => {
       state.isLoading = false;
       state.isError = false;
-      state.message = "failed";
+      state.message = action.payload.message;
     },
     [verify.rejected]: (state, action) => {
       state.isLoading = false;
       state.isError = true;
-      state.message = "failed";
+      state.message = action.payload.message;
     },
     [login.pending]: (state) => {
       state.isLoading = true;
@@ -120,21 +112,21 @@ const authSlice = createSlice({
       state.isLoading = false;
       state.isSuccess = true;
       state.isError = false;
-      state.message = "failed";
+      state.message = action.payload.message;
       state.user = {
         userId: action.payload.userId,
         userType: action.payload.userType,
         authToken: action.payload.authToken,
-      }
+      };
     },
     [login.rejected]: (state, action) => {
       state.isLoading = false;
       state.isError = true;
-      state.message = "failed";
+      state.message = action.payload.message;
     },
     [logout.fulfilled]: (state) => {
       state.user = null;
-    }
+    },
   },
 });
 

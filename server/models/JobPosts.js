@@ -5,6 +5,11 @@ const JobPostSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  companyId: {
+    type: mongoose.Schema.Types.ObjectId,
+    required: true,
+    ref: 'Companies'
+  },
   location: {
     type: String,
     required: true,
