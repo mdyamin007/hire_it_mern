@@ -53,10 +53,9 @@ const CV_UploadSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  skills: {
+  skills: [{
     type: String,
-    required: true,
-  },
+  }],
 });
 
 CV_UploadSchema.virtual("id").get(function () {

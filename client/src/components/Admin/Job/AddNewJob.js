@@ -86,7 +86,7 @@ const AddNewJob = ({ setOpenAddModal }) => {
                     <Select
                         options={companiesOptions}
                         name={"companyId"}
-                        className="basic-multi-select"
+                        className="basic-single"
                         classNamePrefix="select"
                         onChange={handleSelectChangeForCompany}
                     />
@@ -122,7 +122,7 @@ const AddNewJob = ({ setOpenAddModal }) => {
                     <Select
                         options={industryOptions}
                         name={"industry"}
-                        className="basic-multi-select"
+                        className="basic-single"
                         classNamePrefix="select"
                         onChange={handleSelectChangeForIndustry}
                     />
@@ -134,7 +134,7 @@ const AddNewJob = ({ setOpenAddModal }) => {
                     <Select
                         options={sectorOptions}
                         name={"sector"}
-                        className="basic-multi-select"
+                        className="basic-single"
                         classNamePrefix="select"
                         onChange={handleSelectChangeForSector}
                     />
