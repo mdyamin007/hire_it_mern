@@ -7,7 +7,7 @@ import { useDispatch } from "react-redux"
 import { uploadApplication } from "../../redux/features/cvSlice";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify"
-import { industryOptions, sectorOptions } from "../../utils/SelectOptions";
+import { industryOptions, sectorOptions, skillOptions } from "../../utils/SelectOptions";
 
 const ApplicationForm = () => {
 
@@ -34,6 +34,10 @@ const ApplicationForm = () => {
     const handleSelectChangeForSector = (option) => {
         setData((prev) => ({ ...prev, sector: option.value }));
     };
+
+    const handleSelectChangeForSkill = (options) => {
+        setData((prev) => ({ ...prev, skills: options.map(option => option.value) }))
+    }
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -123,7 +127,7 @@ const ApplicationForm = () => {
                     <Select
                         options={industryOptions}
                         name={"industry"}
-                        className="basic-multi-select"
+                        className="basic-single"
                         classNamePrefix="select"
                         onChange={handleSelectChangeForIndustry}
                     />
@@ -135,7 +139,7 @@ const ApplicationForm = () => {
                     <Select
                         options={sectorOptions}
                         name={"sector"}
-                        className="basic-multi-select"
+                        className="basic-single"
                         classNamePrefix="select"
                         onChange={handleSelectChangeForSector}
                     />
@@ -164,14 +168,20 @@ const ApplicationForm = () => {
                     type={"text"}
                     onChange={handleInputChange}
                 />
-                <Input
-                    id={"skills"}
-                    name={"skills"}
-                    label={"Skills"}
-                    required={true}
-                    type={"text"}
-                    onChange={handleInputChange}
-                />
+                <div className="my-4">
+                    <label className="block text-gray-900 text-sm font-bold mb-2">
+                        Skills
+                    </label>
+                    <Select
+                        isMulti
+                        name="skills"
+                        options={skillOptions}
+                        className="basic-multi-select"
+                        classNamePrefix="select"
+                        placeholder="Communication, Management, Leadership..."
+                        onChange={handleSelectChangeForSkill}
+                    />
+                </div>
                 <div className="flex items-center justify-center">
                     <Button bgColor={"bg-blue-500"} hoverColor={"hover:bg-blue-600"} text={"Apply"} textColor={"text-white"} type={"submit"} />
                 </div>
