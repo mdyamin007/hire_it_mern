@@ -22,8 +22,9 @@ export const getAllJobPosts = createAsyncThunk("jobs/all", async (_, thunkAPI) =
 
 export const getAJobPostByID = createAsyncThunk("jobs/id", async (id, thunkAPI) => {
     try {
-        const res = await axios.get(`/api/v1/job_posts/${id}`)
-        return res.jobDescription
+        const res = await axios.get(`${BASE_URL}/api/v1/job_posts/${id}`)
+        console.log(res.data)
+        return res.data.jobDescription
     } catch (error) {
         console.log(error)
         return thunkAPI.rejectWithValue(error.response.data);
