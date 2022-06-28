@@ -6,25 +6,30 @@ import { createAJobPost } from "../../../redux/features/jobSlice";
 import Button from "../../Elements/Button";
 import FormTitle from "../../Elements/FormTitle";
 import Input from "../../Elements/Input";
-import Select from "react-select"
+import Select from "react-select";
+import { industryOptions, sectorOptions } from "../../../utils/SelectOptions";
 
 const AddNewJob = ({ setOpenAddModal }) => {
     const [newJobPost, setNewJobPost] = useState();
-    const [companiesOptions, setCompaniesOptions] = useState()
+    const [companiesOptions, setCompaniesOptions] = useState();
 
     const dispatch = useDispatch();
     const { companies } = useSelector((state) => state.companies);
 
     useEffect(() => {
-        dispatch(getAllCompanies())
+        dispatch(getAllCompanies());
     }, []);
 
     useEffect(() => {
         if (companies) {
-            setCompaniesOptions(companies.map(company => ({ label: company.companyName, value: company._id })))
+            setCompaniesOptions(
+                companies.map((company) => ({
+                    label: company.companyName,
+                    value: company._id,
+                }))
+            );
         }
-    }, [companies])
-
+    }, [companies]);
 
     const handleInputChange = (e) => {
         if (e.target.value) {
@@ -32,9 +37,17 @@ const AddNewJob = ({ setOpenAddModal }) => {
         }
     };
 
-    const handleSelectChange = (option) => {
-        setNewJobPost(prev => ({ ...prev, companyId: option.value }))
-    }
+    const handleSelectChangeForCompany = (option) => {
+        setNewJobPost((prev) => ({ ...prev, companyId: option.value }));
+    };
+
+    const handleSelectChangeForIndustry = (option) => {
+        setNewJobPost((prev) => ({ ...prev, industry: option.value }));
+    };
+
+    const handleSelectChangeForSector = (option) => {
+        setNewJobPost((prev) => ({ ...prev, sector: option.value }));
+    };
 
     const handleSubmit = async () => {
         if (newJobPost) {
@@ -67,9 +80,7 @@ const AddNewJob = ({ setOpenAddModal }) => {
                     onChange={handleInputChange}
                 />
                 <div className="my-4">
-                    <label
-                        className="block text-gray-900 text-sm font-bold mb-2"
-                    >
+                    <label className="block text-gray-900 text-sm font-bold mb-2">
                         Company name
                     </label>
                     <Select
@@ -77,7 +88,7 @@ const AddNewJob = ({ setOpenAddModal }) => {
                         name={"companyId"}
                         className="basic-multi-select"
                         classNamePrefix="select"
-                        onChange={handleSelectChange}
+                        onChange={handleSelectChangeForCompany}
                     />
                 </div>
                 <Input
@@ -104,14 +115,30 @@ const AddNewJob = ({ setOpenAddModal }) => {
                     type={"text"}
                     onChange={handleInputChange}
                 />
-                <Input
-                    id={"sector"}
-                    label={"Sector"}
-                    name={"sector"}
-                    required={false}
-                    type={"text"}
-                    onChange={handleInputChange}
-                />
+                <div className="my-4">
+                    <label className="block text-gray-900 text-sm font-bold mb-2">
+                        Industry
+                    </label>
+                    <Select
+                        options={industryOptions}
+                        name={"industry"}
+                        className="basic-multi-select"
+                        classNamePrefix="select"
+                        onChange={handleSelectChangeForIndustry}
+                    />
+                </div>
+                <div className="my-4">
+                    <label className="block text-gray-900 text-sm font-bold mb-2">
+                        Sector
+                    </label>
+                    <Select
+                        options={sectorOptions}
+                        name={"sector"}
+                        className="basic-multi-select"
+                        classNamePrefix="select"
+                        onChange={handleSelectChangeForSector}
+                    />
+                </div>
                 <Input
                     id={"subSector"}
                     label={"Sub sector"}
@@ -120,14 +147,7 @@ const AddNewJob = ({ setOpenAddModal }) => {
                     type={"text"}
                     onChange={handleInputChange}
                 />
-                <Input
-                    id={"industry"}
-                    label={"Industry"}
-                    name={"industry"}
-                    required={false}
-                    type={"text"}
-                    onChange={handleInputChange}
-                />
+
                 <Input
                     id={"consultantName"}
                     label={"Consultant/HR name"}

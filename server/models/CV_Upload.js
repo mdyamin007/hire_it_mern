@@ -37,10 +37,6 @@ const CV_UploadSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  subIndustry: {
-    type: String,
-    required: true,
-  },
   sector: {
     type: String,
     required: true,
