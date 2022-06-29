@@ -425,3 +425,26 @@ export const skillOptions = [
         label: "Facilities Management",
     },
 ];
+
+export const educationOptions = [
+    {
+        label: "Degree",
+        value: "degree"
+    },
+    {
+        label: "Diploma",
+        value: "diploma"
+    },
+    {
+        label: "Bachelor",
+        value: "bachelor"
+    },
+    {
+        label: "Master",
+        value: "master"
+    },
+    {
+        label: "PhD.",
+        value: "phd"
+    }
+]

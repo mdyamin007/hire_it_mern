@@ -7,7 +7,7 @@ import { useDispatch } from "react-redux"
 import { uploadApplication } from "../../redux/features/cvSlice";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify"
-import { industryOptions, sectorOptions, skillOptions } from "../../utils/SelectOptions";
+import { educationOptions, industryOptions, sectorOptions, skillOptions } from "../../utils/SelectOptions";
 
 const ApplicationForm = () => {
 
@@ -37,6 +37,10 @@ const ApplicationForm = () => {
 
     const handleSelectChangeForSkill = (options) => {
         setData((prev) => ({ ...prev, skills: options.map(option => option.value) }))
+    }
+
+    const handleSelectChangeForEducation = (option) => {
+        setData(prev => ({ ...prev, education: option.value }));
     }
 
     const handleSubmit = (e) => {
@@ -182,6 +186,27 @@ const ApplicationForm = () => {
                         onChange={handleSelectChangeForSkill}
                     />
                 </div>
+                <div className="my-4">
+                    <label className="block text-gray-900 text-sm font-bold mb-2">
+                        Education
+                    </label>
+                    <Select
+                        name="education"
+                        options={educationOptions}
+                        className="basic-single"
+                        classNamePrefix="select"
+                        placeholder="Degree"
+                        onChange={handleSelectChangeForEducation}
+                    />
+                </div>
+                <Input
+                    id={"major"}
+                    name={"major"}
+                    label={"Major"}
+                    required={true}
+                    type={"text"}
+                    onChange={handleInputChange}
+                />
                 <div className="flex items-center justify-center">
                     <Button bgColor={"bg-blue-500"} hoverColor={"hover:bg-blue-600"} text={"Apply"} textColor={"text-white"} type={"submit"} />
                 </div>

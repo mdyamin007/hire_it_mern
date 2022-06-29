@@ -56,6 +56,14 @@ const CV_UploadSchema = new mongoose.Schema({
   skills: [{
     type: String,
   }],
+  education: {
+    type: String,
+    required: true
+  },
+  major: {
+    type: String,
+    required: true,
+  }
 });
 
 CV_UploadSchema.virtual("id").get(function () {

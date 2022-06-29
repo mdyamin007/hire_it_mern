@@ -45,7 +45,14 @@ const JobPostSchema = new mongoose.Schema({
   email: {
     type: String,
     required: false,
-  }
+  },
+  certifications: {
+    type: String,
+    required: true,
+  },
+  skills: [{
+    type: String,
+  }],
 });
 
 JobPostSchema.virtual("id").get(function () {

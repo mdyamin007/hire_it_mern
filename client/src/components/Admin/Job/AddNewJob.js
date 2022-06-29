@@ -7,7 +7,7 @@ import Button from "../../Elements/Button";
 import FormTitle from "../../Elements/FormTitle";
 import Input from "../../Elements/Input";
 import Select from "react-select";
-import { industryOptions, sectorOptions } from "../../../utils/SelectOptions";
+import { industryOptions, sectorOptions, skillOptions } from "../../../utils/SelectOptions";
 
 const AddNewJob = ({ setOpenAddModal }) => {
     const [newJobPost, setNewJobPost] = useState();
@@ -48,6 +48,10 @@ const AddNewJob = ({ setOpenAddModal }) => {
     const handleSelectChangeForSector = (option) => {
         setNewJobPost((prev) => ({ ...prev, sector: option.value }));
     };
+
+    const handleSelectChangeForSkill = (options) => {
+        setNewJobPost((prev) => ({ ...prev, skills: options.map(option => option.value) }))
+    }
 
     const handleSubmit = async () => {
         if (newJobPost) {
@@ -169,6 +173,29 @@ const AddNewJob = ({ setOpenAddModal }) => {
                     label={"Salary range"}
                     name={"salaryRange"}
                     required={false}
+                    type={"text"}
+                    onChange={handleInputChange}
+                />
+
+                <div className="my-4">
+                    <label className="block text-gray-900 text-sm font-bold mb-2">
+                        Skills
+                    </label>
+                    <Select
+                        isMulti
+                        name="skills"
+                        options={skillOptions}
+                        className="basic-multi-select"
+                        classNamePrefix="select"
+                        placeholder="Communication, Management, Leadership..."
+                        onChange={handleSelectChangeForSkill}
+                    />
+                </div>
+                <Input
+                    id={"certifications"}
+                    name={"certifications"}
+                    label={"Certifications"}
+                    required={true}
                     type={"text"}
                     onChange={handleInputChange}
                 />
