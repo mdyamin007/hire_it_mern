@@ -50,6 +50,10 @@ function ApplicationDetails() {
                         Skills
                     </h1>
                     <p>{applicantDetails.skills}</p> <br />
+                    <h1 className="text-4xl mt-10 font-semibold text-gray-700">
+                        Education
+                    </h1>
+                    <p>{applicantDetails.education} - {applicantDetails.major}</p> <br />
                     <br />
                     <br />
                     <p>Current Salary: {applicantDetails.currentSalary}</p>
