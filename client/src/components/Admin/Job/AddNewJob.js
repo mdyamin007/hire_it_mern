@@ -7,7 +7,7 @@ import Button from "../../Elements/Button";
 import FormTitle from "../../Elements/FormTitle";
 import Input from "../../Elements/Input";
 import Select from "react-select";
-import { industryOptions, sectorOptions, skillOptions } from "../../../utils/SelectOptions";
+import { certificationOptions, industryOptions, sectorOptions, skillOptions } from "../../../utils/SelectOptions";
 
 const AddNewJob = ({ setOpenAddModal }) => {
     const [newJobPost, setNewJobPost] = useState();
@@ -191,14 +191,20 @@ const AddNewJob = ({ setOpenAddModal }) => {
                         onChange={handleSelectChangeForSkill}
                     />
                 </div>
-                <Input
-                    id={"certifications"}
-                    name={"certifications"}
-                    label={"Certifications"}
-                    required={true}
-                    type={"text"}
-                    onChange={handleInputChange}
-                />
+                <div className="my-4">
+                    <label className="block text-gray-900 text-sm font-bold mb-2">
+                        Certifications
+                    </label>
+                    <Select
+                        isMulti
+                        name="certifications"
+                        options={certificationOptions}
+                        className="basic-multi-select"
+                        classNamePrefix="select"
+                        placeholder=""
+                        onChange={handleSelectChangeForSkill}
+                    />
+                </div>
                 <Button
                     bgColor={"bg-green-500"}
                     hoverColor={"bg-green-600"}

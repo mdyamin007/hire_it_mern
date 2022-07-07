@@ -7,7 +7,7 @@ import { useDispatch } from "react-redux"
 import { uploadApplication } from "../../redux/features/cvSlice";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify"
-import { educationOptions, industryOptions, sectorOptions, skillOptions } from "../../utils/SelectOptions";
+import { certificationOptions, educationOptions, industryOptions, sectorOptions, skillOptions } from "../../utils/SelectOptions";
 
 const ApplicationForm = () => {
 
@@ -164,14 +164,20 @@ const ApplicationForm = () => {
                     type={"text"}
                     onChange={handleInputChange}
                 />
-                <Input
-                    id={"certifications"}
-                    name={"certifications"}
-                    label={"Certifications"}
-                    required={true}
-                    type={"text"}
-                    onChange={handleInputChange}
-                />
+                <div className="my-4">
+                    <label className="block text-gray-900 text-sm font-bold mb-2">
+                        Certifications
+                    </label>
+                    <Select
+                        isMulti
+                        name="certifications"
+                        options={certificationOptions}
+                        className="basic-multi-select"
+                        classNamePrefix="select"
+                        placeholder=""
+                        onChange={handleSelectChangeForSkill}
+                    />
+                </div>
                 <div className="my-4">
                     <label className="block text-gray-900 text-sm font-bold mb-2">
                         Skills
