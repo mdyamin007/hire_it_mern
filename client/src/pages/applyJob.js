@@ -1,16 +1,16 @@
-import { useState } from "react";
-import Input from "../Elements/Input";
-import FormTitle from "../Elements/FormTitle";
-import Button from "../Elements/Button";
+import { useState } from 'react'
+import { useDispatch } from 'react-redux'
+import { useNavigate, useParams } from 'react-router-dom'
+import FormTitle from '../components/Elements/FormTitle'
+import Input from '../components/Elements/Input'
+import Button from "../components/Elements/Button";
 import Select from "react-select";
-import { useDispatch } from "react-redux"
-import { uploadApplication } from "../../redux/features/cvSlice";
-import { useNavigate } from "react-router-dom";
-import { toast } from "react-toastify"
-import { certificationOptions, educationOptions, industryOptions, sectorOptions, skillOptions } from "../../utils/SelectOptions";
+import { certificationOptions, educationOptions, industryOptions, sectorOptions, skillOptions } from '../utils/SelectOptions'
+import { toast } from 'react-toastify'
+import { applyForJob } from '../redux/features/jobSlice'
 
-const ApplicationForm = () => {
-
+function ApplyJob() {
+    const {jobId} = useParams()
     const [data, setData] = useState({})
     const [cv, setCv] = useState()
 
@@ -54,8 +54,10 @@ const ApplicationForm = () => {
         for (let key in data) {
             formData.append(key, data[key])
         }
+        formData.append("jobId", jobId)
         formData.append("cv", cv);
-        dispatch(uploadApplication(formData))
+        console.log(formData)
+        dispatch(applyForJob(formData))
         toast.success("Submitted successfully!")
         navigate("/")
     }
@@ -63,7 +65,7 @@ const ApplicationForm = () => {
     return (
         <div className="container mx-auto mt-10 mb-32">
             <form onSubmit={handleSubmit}>
-                <FormTitle title={"Application form"} />
+                <FormTitle title={"Apply for the job"} />
                 <Input
                     id={"firstName"}
                     name={"firstName"}
@@ -222,7 +224,7 @@ const ApplicationForm = () => {
                 </div>
             </form>
         </div>
-    );
-};
+  )
+}
 
-export default ApplicationForm;
+export default ApplyJob

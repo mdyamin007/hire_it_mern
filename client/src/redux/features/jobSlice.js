@@ -41,6 +41,16 @@ export const createAJobPost = createAsyncThunk("jobs/create", async (data, thunk
     }
 })
 
+export const applyForJob = createAsyncThunk("jobs/apply", async (data, thunkAPI) => {
+    try {
+        const res = await apiAxios("/api/v1/jobCV", "POST", data)
+        return res.message
+    } catch (error) {
+        console.log(error)
+        return thunkAPI.rejectWithValue("Error occurred!");
+    }
+})
+
 const jobPostsSlice = createSlice({
     name: "job_posts",
     initialState,
@@ -53,6 +63,12 @@ const jobPostsSlice = createSlice({
         },
         [getAJobPostByID.fulfilled]: (state, action) => {
             state.job_post = action.payload
+        },
+        [applyForJob.fulfilled]: (state, action) => {
+            state.message = action.payload
+        },
+        [applyForJob.rejected]: (state, action) => {
+            state.message = action.payload
         }
     }
 })
