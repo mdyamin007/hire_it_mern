@@ -20,9 +20,11 @@ const upload = multer({ storage: storage })
 router.route("/").get(checkAdmin, jobCVController.findAllJobCV).post(upload.single('cv'), jobCVController.jobCVCreate);
 
 router
-    .route("/:applicationId")
+    .route("application/:applicationId")
     .get(jobCVController.findById)
     .put(jobCVController.updateJobCV)
     .delete(jobCVController.deleteJobCV);
+
+router.route("/job/:jobId").get(jobCVController.findMany)
 
 module.exports = router;

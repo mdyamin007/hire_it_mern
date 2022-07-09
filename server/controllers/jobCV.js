@@ -79,10 +79,28 @@ const findById = async (req, res) => {
     }
 };
 
+const findMany = async (req, res) => {
+    try {
+        const jobId = req.params.jobId;
+        console.log(jobId)
+        const data = await jobCVService.findMany(jobId)
+        console.log(data)
+        res.status(200).json({
+            message: "data fetched successfully",
+            cv: data,
+        })
+    } catch (error) {
+        res.status(500).json({
+            message: err.message
+        })
+    }
+}
+
 module.exports = {
     jobCVCreate,
     findAllJobCV,
     updateJobCV,
     deleteJobCV,
     findById,
+    findMany
 };

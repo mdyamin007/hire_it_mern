@@ -23,10 +23,15 @@ const deleteJobCV = async (cvId) => {
 };
 
 const findById = async (applicationId) => {
-    const foundComapny = await jobCV.findById(applicationId);
+    const foundCV = await jobCV.findById(applicationId);
 
-    return foundComapny;
+    return foundCV;
 };
+
+const findMany = async (filter) => {
+    const found = await jobCV.find({jobId: filter})
+    return found
+}
 
 module.exports = {
     createJobCV,
@@ -34,4 +39,5 @@ module.exports = {
     updateJobCV,
     deleteJobCV,
     findById,
+    findMany,
 };
