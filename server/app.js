@@ -7,6 +7,7 @@ const mongoose = require("mongoose");
 
 const userRouter = require("./routers/users");
 const cvRouter = require("./routers/cv");
+const jobCVRouter = require("./routers/jobCV")
 const companiesRouter = require("./routers/companies");
 const jobsRouter = require("./routers/jobPosts");
 const checkAdmin = require("./middlewares/checkAdmin");
@@ -50,6 +51,7 @@ app.use(
   passport.authenticate("jwt", { session: false }),
   cvRouter
 );
+app.use("/api/v1/jobCV", passport.authenticate("jwt", { session: false }), jobCVRouter)
 app.use("/api/v1/companies", checkAdmin, companiesRouter);
 app.use("/api/v1/job_posts", jobsRouter);
 
