@@ -15,6 +15,9 @@ import PrivateRouteUser from "./components/PrivateRouteUser";
 import Submit_cv from "./pages/submit_cv";
 import Applications from "./pages/applications";
 import ApplicationDetails from "./pages/application_details";
+import ApplyJob from "./pages/applyJob";
+import JobPosts2 from "./pages/job_posts_2";
+import CVPerJob from "./pages/cv_per_job";
 
 function App() {
   return (
@@ -29,6 +32,7 @@ function App() {
             <Route path="/job_details/:jobPostId" element={<JobDetails />} />
             <Route element={<PrivateRouteUser />} >
               <Route path="submit_cv" element={<Submit_cv />} />
+              <Route path="apply/:jobId" element={<ApplyJob />} />
             </Route>
             <Route element={<PrivateRouteAdmin />} >
               <Route path="/admin_dashboard" element={<AdminDashboard />} />
@@ -36,7 +40,8 @@ function App() {
               <Route path="/job_posts" element={<JobPosts />} />
               <Route path="/applications" element={<Applications />} />
               <Route path="/applications/:applicationId" element={<ApplicationDetails />} />
-
+              <Route path="/applications_per_job" element={<JobPosts2 />} />
+              <Route path="/job/:jobId/applications" element={<CVPerJob />} />
             </Route>
           </Route>
         </Routes>

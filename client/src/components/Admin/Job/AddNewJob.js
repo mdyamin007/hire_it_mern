@@ -53,6 +53,10 @@ const AddNewJob = ({ setOpenAddModal }) => {
         setNewJobPost((prev) => ({ ...prev, skills: options.map(option => option.value) }))
     }
 
+    const handleSelectChangeForCertification = (options) => {
+        setNewJobPost(prev => ({...prev, certifications: options.map(option => option.value)}))
+    }
+
     const handleSubmit = async () => {
         if (newJobPost) {
             try {
@@ -202,7 +206,7 @@ const AddNewJob = ({ setOpenAddModal }) => {
                         className="basic-multi-select"
                         classNamePrefix="select"
                         placeholder=""
-                        onChange={handleSelectChangeForSkill}
+                        onChange={handleSelectChangeForCertification}
                     />
                 </div>
                 <Button

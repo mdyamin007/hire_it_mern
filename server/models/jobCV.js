@@ -49,10 +49,9 @@ const jobCVSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
-    certifications: {
+    certifications: [{
         type: String,
-        required: true,
-    },
+    }],
     skills: [{
         type: String,
     }],

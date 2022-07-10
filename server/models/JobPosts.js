@@ -46,10 +46,9 @@ const JobPostSchema = new mongoose.Schema({
     type: String,
     required: false,
   },
-  certifications: {
+  certifications: [{
     type: String,
-    required: true,
-  },
+  }],
   skills: [{
     type: String,
   }],
