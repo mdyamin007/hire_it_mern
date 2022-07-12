@@ -18,6 +18,7 @@ import ApplicationDetails from "./pages/application_details";
 import ApplyJob from "./pages/applyJob";
 import JobPosts2 from "./pages/job_posts_2";
 import CVPerJob from "./pages/cv_per_job";
+import JobApplicationDetails from "./pages/job_application_details";
 
 function App() {
   return (
@@ -30,18 +31,25 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/verify/:userId/:tokenId" element={<Verification />} />
             <Route path="/job_details/:jobPostId" element={<JobDetails />} />
-            <Route element={<PrivateRouteUser />} >
+            <Route element={<PrivateRouteUser />}>
               <Route path="submit_cv" element={<Submit_cv />} />
               <Route path="apply/:jobId" element={<ApplyJob />} />
             </Route>
-            <Route element={<PrivateRouteAdmin />} >
+            <Route element={<PrivateRouteAdmin />}>
               <Route path="/admin_dashboard" element={<AdminDashboard />} />
               <Route path="/companies" element={<Companies />} />
               <Route path="/job_posts" element={<JobPosts />} />
               <Route path="/applications" element={<Applications />} />
-              <Route path="/applications/:applicationId" element={<ApplicationDetails />} />
+              <Route
+                path="/applications/:applicationId"
+                element={<ApplicationDetails />}
+              />
               <Route path="/applications_per_job" element={<JobPosts2 />} />
               <Route path="/job/:jobId/applications" element={<CVPerJob />} />
+              <Route
+                path="/job/applications/:jobApplicationId"
+                element={<JobApplicationDetails />}
+              />
             </Route>
           </Route>
         </Routes>
