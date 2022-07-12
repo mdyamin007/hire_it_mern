@@ -1,30 +1,32 @@
 const express = require("express");
-const jobCVController = require("../controllers/jobCV")
+const jobCVController = require("../controllers/jobCV");
 
 const router = express.Router();
-const multer = require("multer")
-const checkAdmin = require("../middlewares/checkAdmin")
-
+const multer = require("multer");
+const checkAdmin = require("../middlewares/checkAdmin");
 
 const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, "public/jobCV")
-    },
-    filename: (req, file, cb) => {
-        cb(null, Date.now() + "_" + file.originalname)
-    }
-})
+  destination: (req, file, cb) => {
+    cb(null, "public/jobCV");
+  },
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + "_" + file.originalname);
+  },
+});
 
-const upload = multer({ storage: storage })
-
-router.route("/").get(checkAdmin, jobCVController.findAllJobCV).post(upload.single('cv'), jobCVController.jobCVCreate);
+const upload = multer({ storage: storage });
 
 router
-    .route("application/:applicationId")
-    .get(jobCVController.findById)
-    .put(jobCVController.updateJobCV)
-    .delete(jobCVController.deleteJobCV);
+  .route("/")
+  .get(checkAdmin, jobCVController.findAllJobCV)
+  .post(upload.single("cv"), jobCVController.jobCVCreate);
 
-router.route("/job/:jobId").get(jobCVController.findMany)
+router
+  .route("/application/:applicationId")
+  .get(checkAdmin, jobCVController.findById)
+  .put(checkAdmin, jobCVController.updateJobCV)
+  .delete(checkAdmin, jobCVController.deleteJobCV);
+
+router.route("/job/:jobId").get(checkAdmin, jobCVController.findMany);
 
 module.exports = router;
