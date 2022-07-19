@@ -8,7 +8,7 @@ const JobPostSchema = new mongoose.Schema({
   companyId: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,
-    ref: 'Companies'
+    ref: "Companies",
   },
   location: {
     type: String,
@@ -46,12 +46,24 @@ const JobPostSchema = new mongoose.Schema({
     type: String,
     required: false,
   },
-  certifications: [{
+  certifications: [
+    {
+      type: String,
+    },
+  ],
+  skills: [
+    {
+      type: String,
+    },
+  ],
+  education: {
     type: String,
-  }],
-  skills: [{
+    required: true,
+  },
+  major: {
     type: String,
-  }],
+    required: true,
+  },
 });
 
 JobPostSchema.virtual("id").get(function () {
@@ -62,9 +74,6 @@ JobPostSchema.set("toJSON", {
   virtuals: true,
 });
 
-const JobPost = mongoose.model(
-  "Job_Posts",
-  JobPostSchema,
-);
+const JobPost = mongoose.model("Job_Posts", JobPostSchema);
 
 module.exports = JobPost;
