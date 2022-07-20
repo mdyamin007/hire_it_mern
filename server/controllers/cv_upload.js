@@ -1,4 +1,5 @@
 const CV_UploadService = require("../services/cvUpload");
+const MATCHHELPER = require("../_helper/match.helper");
 
 const cvUpload = async (req, res) => {
   try {
@@ -8,6 +9,7 @@ const cvUpload = async (req, res) => {
       cv: req.file.path
     }
     const createdCv = await CV_UploadService.upLoadCv(cv);
+    await MATCHHELPER.matchJob(createdCv._id);
     res.status(201).json({
       message: "CV created successfully",
       cv: createdCv,
@@ -38,6 +40,7 @@ const updateCv = async (req, res) => {
     const applicationId = req.params.applicationId;
     const cv = req.body;
     const updatedCv = await CV_UploadService.updateCv(applicationId, cv);
+    await MATCHHELPER.matchJob(updatedCv._id);
     res.status(200).json({
       message: "CV updated successfully",
       cv: updatedCv,

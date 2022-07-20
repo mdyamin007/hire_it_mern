@@ -1,18 +1,22 @@
 const jobCVService = require("../services/jobCV");
+const MATCHHELPER = require("../_helper/match.helper");
 
 const jobCVCreate = async (req, res) => {
     try {
         let cv = req.body;
+        cv.education = "degree";
         cv = {
             ...cv,
             cv: req.file.path,
         };
         const createdCv = await jobCVService.createJobCV(cv);
+        await MATCHHELPER.matchJob(createdCv._id) ;
         res.status(201).json({
             message: "CV created successfully",
             cv: createdCv,
         });
     } catch (err) {
+        console.log(err);
         res.status(500).json({
             message: err.message,
         });
@@ -38,6 +42,7 @@ const updateJobCV = async (req, res) => {
         const applicationId = req.params.applicationId;
         const cv = req.body;
         const updatedCv = await jobCVService.updateJobCV(applicationId, cv);
+        await MATCHHELPER.matchJob(updatedCv._id) ;
         res.status(200).json({
             message: "CV updated successfully",
             cv: updatedCv,

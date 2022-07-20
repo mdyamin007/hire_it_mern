@@ -10,6 +10,7 @@ const cvRouter = require("./routers/cv");
 const jobCVRouter = require("./routers/jobCV")
 const companiesRouter = require("./routers/companies");
 const jobsRouter = require("./routers/jobPosts");
+const profileMatcherRouter = require("./routers/profileMacther");
 const checkAdmin = require("./middlewares/checkAdmin");
 require("./config/passport");
 
@@ -54,6 +55,7 @@ app.use(
 app.use("/api/v1/jobCV", passport.authenticate("jwt", { session: false }), jobCVRouter)
 app.use("/api/v1/companies", checkAdmin, companiesRouter);
 app.use("/api/v1/job_posts", jobsRouter);
+app.use("/api/v1/profileMatcher", profileMatcherRouter);
 
 
 /// catch 404 and forward to error handler

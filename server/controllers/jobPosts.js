@@ -1,4 +1,5 @@
 const JobPostService = require("../services/jobPosts");
+const MATCHHELPER = require("../_helper/match.helper");
 
 const createJobDescription = async (req, res) => {
   try {
@@ -6,6 +7,7 @@ const createJobDescription = async (req, res) => {
     const createdJobDescription = await JobPostService.createJob_Description(
       jobDescription,
     );
+    await MATCHHELPER.matchCV(createdJobDescription._id);
     res.status(201).json({
       message: "JobDescription created successfully",
       jobDescription: createdJobDescription,
@@ -53,6 +55,7 @@ const updateJobDescription = async (req, res) => {
       jobDescriptionId,
       jobDescription,
     );
+    await MATCHHELPER.matchCV(updatedJobDescription._id);
     res.status(200).json({
       message: "JobDescription updated successfully",
       jobDescription: updatedJobDescription,
