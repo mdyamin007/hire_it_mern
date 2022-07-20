@@ -72,6 +72,7 @@ module.exports = {
 
         let matchFieldCount = 0;
         let skillMatchCount = 0;
+        let educationMatchCount=0;
         let certificationMatchCount = 0;
         let skillScore = 0;
         let certificationScore = 0;
@@ -106,6 +107,12 @@ module.exports = {
             }
           }
           certificationScore = (certificationMatchCount * 100) / certificatoinReqCount;
+        }
+        if(cvObj.educateducation == jobPosts.education){
+          matchFieldCount++
+          educationMatchCount = 100;
+        }else{
+          educationMatchCount = 50;
         }
 
 
@@ -201,47 +208,60 @@ module.exports = {
       } else if (searchEndDate) {
         whereQuery.updatedAt = { $gte: searchEndDate };
       }
-      jobList = await CVUPLOADMODEL.find(whereQuery).sort({ 'createdAt': -1 });
+      jobList = await JOBPOSTSMODEL.find(whereQuery).sort({ 'createdAt': -1 });
 
       var breakCount = 0;
       for (const jobObj of jobList) {
 
         let matchFieldCount = 0;
         let skillMatchCount = 0;
+        let educationMatchCount=0;
         let certificationMatchCount = 0;
         let skillScore = 0;
         let certificationScore = 0;
         let applicantScore = 0;
+
         jobObj.skillCode = jobObj.skillCode ? jobObj.skillCode : '';
-        let cvSkillArray = jobObj.skillCode.replace(/::/g, "|").replace(/:/g, "").split('|');
+        let jobSkillArray = jobObj.skillCode.replace(/::/g, "|").replace(/:/g, "").split('|');
+
         jobObj.certificationCode = jobObj.certificationCode ? jobObj.certificationCode : '';
-        let cvCertificationsArray = jobObj.certificationCode.replace(/::/g, "|").replace(/:/g, "").split('|');
+        let jobCertificationsArray = jobObj.certificationCode.replace(/::/g, "|").replace(/:/g, "").split('|');
 
-        if (cvSkillArray.length == 1 && cvSkillArray[0] == '') {
-          cvSkillArray = [];
+        if (jobSkillArray.length == 1 && jobSkillArray[0] == '') {
+          jobSkillArray = [];
         }
-        if (cvCertificationsArray.length == 1 && cvCertificationsArray[0] == '') {
-          cvCertificationsArray = [];
+        if (jobCertificationsArray.length == 1 && jobCertificationsArray[0] == '') {
+          jobCertificationsArray = [];
         }
 
-        if (skillReqCount > 0) {
+        let jobSkillReqCount = skillArray.length;
+        let jobCertificatoinReqCount = certificationsArray.length;
+
+        if (jobSkillReqCount > 0) {
           matchFieldCount++;
-          for (let i = 0; i < skillArray.length; i++) {
-            if (cvSkillArray.indexOf(skillArray[i]) > -1) {
+          for (let i = 0; i < jobSkillArray.length; i++) {
+            if (skillArray.indexOf(jobSkillArray[i]) > -1) {
               skillMatchCount++;
             }
           }
-          skillScore = (skillMatchCount * 100) / skillReqCount;
+          skillScore = (skillMatchCount * 100) / jobSkillReqCount;
         }
 
-        if (certificatoinReqCount > 0) {
+        if (jobCertificatoinReqCount > 0) {
           matchFieldCount++;
-          for (let i = 0; i < certificationsArray.length; i++) {
-            if (cvCertificationsArray.indexOf(certificationsArray[i]) > -1) {
+          for (let i = 0; i < jobCertificationsArray.length; i++) {
+            if (certificationsArray.indexOf(jobCertificationsArray[i]) > -1) {
               certificationMatchCount++;
             }
           }
-          certificationScore = (certificationMatchCount * 100) / certificatoinReqCount;
+          certificationScore = (certificationMatchCount * 100) / jobCertificatoinReqCount;
+        }
+
+        if(jobObj.educateducation == applicationCV.education){
+          matchFieldCount++
+          educationMatchCount = 100;
+        }else{
+          educationMatchCount = 50;
         }
 
 
