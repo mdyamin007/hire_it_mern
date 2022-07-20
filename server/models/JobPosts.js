@@ -64,6 +64,26 @@ const JobPostSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  skillCode:{
+    type:String,
+  
+  },
+  certificationCode:{
+    type:String,
+    
+  },  
+
+  matchStartDate: {
+    type: Date,
+    default: null
+  },
+  matchEndDate: {
+    type: Date,
+    default: null
+  }
+},
+{
+  timestamps: true
 });
 
 JobPostSchema.virtual("id").get(function () {
@@ -75,5 +95,13 @@ JobPostSchema.set("toJSON", {
 });
 
 const JobPost = mongoose.model("Job_Posts", JobPostSchema);
+
+JobPostSchema.pre(/^save|findOneAndUpdate$/, true, async function (next, done) {
+  try {
+    this.skillCode = ":A:";
+    next();
+  }
+  catch (err) { done(err); next(); }
+});
 
 module.exports = JobPost;

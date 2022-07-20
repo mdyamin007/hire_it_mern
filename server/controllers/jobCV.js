@@ -3,6 +3,7 @@ const jobCVService = require("../services/jobCV");
 const jobCVCreate = async (req, res) => {
     try {
         let cv = req.body;
+        cv.education = "degree";
         cv = {
             ...cv,
             cv: req.file.path,
@@ -13,6 +14,7 @@ const jobCVCreate = async (req, res) => {
             cv: createdCv,
         });
     } catch (err) {
+        console.log(err);
         res.status(500).json({
             message: err.message,
         });

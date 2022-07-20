@@ -62,7 +62,26 @@ const CV_UploadSchema = new mongoose.Schema({
   major: {
     type: String,
     required: true,
+  },
+  skillCode:{
+    type:String,
+   
+  },  
+  certificationCode:{
+    type:String,
+   
+  },  
+  matchStartDate: {
+    type: Date,
+    default: null
+  },
+  matchEndDate: {
+    type: Date,
+    default: null
   }
+},
+{
+  timestamps: true
 });
 
 CV_UploadSchema.virtual("id").get(function () {
@@ -74,5 +93,15 @@ CV_UploadSchema.set("toJSON", {
 });
 
 const CV_Upload = mongoose.model("CV_Upload", CV_UploadSchema);
+CV_UploadSchema.pre(/^save|findOneAndUpdate$/, true, async function (next, done) {
+  try {
+    const skills = this.skills;
+    console.log(skills);
+    this.skillCode = ":A:";
+    // done();
+    next();
+  }
+  catch (err) { done(err); next(); }
+});
 
 module.exports = CV_Upload;
