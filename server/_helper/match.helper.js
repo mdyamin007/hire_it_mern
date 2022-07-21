@@ -10,8 +10,8 @@ module.exports = {
       var searchStartDate = null;
       var searchEndDate = null;
       var whereQuery = {};
-      var firstRecord = await JOBCVMODEL.find({ sort: { 'createdAt': -1 } }).limit(1);
-      var lastRecord = await JOBCVMODEL.find({ sort: { 'createdAt': -1 } }).limit(1).skip(100);
+      var firstRecord = await JOBCVMODEL.findfind().sort({ 'createdAt': -1 }).limit(1);
+      var lastRecord = await JOBCVMODEL.findfind().sort({ 'createdAt': -1 }).limit(1).skip(100);
 
       if (firstRecord.length > 0) {
         searchStartDate = firstRecord[0].updatedAt;
@@ -153,8 +153,8 @@ module.exports = {
       var searchStartDate = null;
       var searchEndDate = null;
       var whereQuery = {};
-      var firstRecord = await JOBPOSTSMODEL.find({ sort: { 'createdAt': -1 } }).limit(1);
-      var lastRecord = await JOBPOSTSMODEL.find({ sort: { 'createdAt': -1 } }).limit(1).skip(100);
+      var firstRecord = await JOBPOSTSMODEL.find().sort({ 'createdAt': -1 }).limit(1);
+      var lastRecord = await JOBPOSTSMODEL.find().sort({ 'createdAt': -1 }).limit(1).skip(100);
       if (firstRecord.length > 0) {
         searchStartDate = firstRecord[0].updatedAt;
       }
