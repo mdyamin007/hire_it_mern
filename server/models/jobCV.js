@@ -75,8 +75,15 @@ const jobCVSchema = new mongoose.Schema({
     },
     jobId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Job_Posts",
-        required: true,
+        ref: "Job_Posts"
+    },  
+    matchStartDate: {
+      type: Date,
+      default: null
+    },
+    matchEndDate: {
+      type: Date,
+      default: null
     }
 },
 {
@@ -97,8 +104,11 @@ jobCVSchema.pre(/^save|findOneAndUpdate$/, true, async function (next, done) {
         const skillList = this.skills.toString().split(',');
         console.log(skillList);
 
-        const matchSkill = skillList.map(i=>skillOptions.find(j=>i === j.value))
+        var matchSkill = skillList.map(i=>skillOptions.find(j=>i === j.value))
         // [ {value: 'Teamwork', label: 'Teamwork', code: 'A'},{value: 'Legal', label: 'Legal', code: 'B'}]
+        matchSkill = matchSkill.filter(function( element ) {
+            return element !== undefined;
+         });
         console.log("matchSkill==>",matchSkill);
         console.log("matchSkill==>",matchSkill.length);
         if(matchSkill.length>0){
@@ -108,11 +118,15 @@ jobCVSchema.pre(/^save|findOneAndUpdate$/, true, async function (next, done) {
 
             this.skillCode =temp;
         }
+        console.log(this.certifications);
         const certificationList = this.certifications.toString().split(',');
         console.log(certificationList);
 
-        const matchcertifications = certificationList.map(i=>certificationOptions.find(j=>i === j.value))
-        // [ {value: 'Teamwork', label: 'Teamwork', code: 'A'},{value: 'Legal', label: 'Legal', code: 'B'}]
+        var matchcertifications = certificationList.map(i=>certificationOptions.find(j=>i === j.value));
+        matchcertifications = matchcertifications.filter(function( element ) {
+            return element !== undefined;
+         });
+        
         console.log("matchSkill==>",matchcertifications);
         console.log("matchSkill==>",matchcertifications.length);
         if(matchcertifications.length>0){

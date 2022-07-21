@@ -1,5 +1,4 @@
 const Job_Description = require("../models/JobPosts");
-const CV_Upload = require("../models/CV_Upload");
 const MATCHHELPER = require("../_helper/match.helper");
 const Profile_MatcherModel = require("../models/profileMatcher");
 

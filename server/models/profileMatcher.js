@@ -10,14 +10,31 @@ const profileMatcherSchema = new mongoose.Schema({
   applicationId: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,
-    ref: 'CV_Upload'
+    ref: 'jobCV'
   },
- score: {
+  skillScore: {
     type: Number,
     required: true
-  }},{
-    timestamps: true
-  });
+  },
+  certificationScore: {
+    type: Number,
+    required: true
+  },
+  educationScore: {
+    type: Number,
+    required: true
+  },
+  matchFieldCount: {
+    type: Number,
+    required: true
+  },
+  score: {
+    type: Number,
+    required: true
+  }
+}, {
+  timestamps: true
+});
 
 profileMatcherSchema.virtual("id").get(function () {
   return this._id.toHexString();

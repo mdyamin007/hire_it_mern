@@ -53,13 +53,13 @@ const matchJobByApplicationId= async (req, res) => {
     var sortingQuery = { createdAt: -1 };
     var conditionQuery = {};
     var populateQuery = [];
-  
+  console.log(req.body);
     if(payload.job_id){
       conditionQuery = { "jobId": payload.job_id };
       populateQuery.push({ path: "applicationId", select: "-__v -skillCode  -certificationCode"});
     }else{
       conditionQuery = { "applicationId": payload.application_id };
-      populateQuery.push({ path: "applicationId", select: "-__v -skillCode -certificationCode"});
+      populateQuery.push({ path: "jobId", select: "-__v -skillCode -certificationCode"});
     }
     // FILTER
     if (min_score>0 && max_score>0) {

@@ -52,6 +52,7 @@ function ApplyJob() {
   };
 
   const handleSelectChangeForCertification = (options) => {
+    debugger;
     setData((prev) => ({
       ...prev,
       certifications: options.map((option) => option.value),

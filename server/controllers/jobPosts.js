@@ -4,6 +4,7 @@ const MATCHHELPER = require("../_helper/match.helper");
 const createJobDescription = async (req, res) => {
   try {
     const jobDescription = req.body;
+    console.log(jobDescription);
     const createdJobDescription = await JobPostService.createJob_Description(
       jobDescription,
     );
