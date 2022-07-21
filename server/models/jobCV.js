@@ -79,7 +79,8 @@ const jobCVSchema = new mongoose.Schema({
     },  
     matchStartDate: {
       type: Date,
-      default: null
+      default: null,
+      index:true,
     },
     matchEndDate: {
       type: Date,
