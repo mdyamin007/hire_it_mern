@@ -12,7 +12,7 @@ const companiesRouter = require("./routers/companies");
 const jobsRouter = require("./routers/jobPosts");
 const profileMatcherRouter = require("./routers/profileMacther");
 const checkAdmin = require("./middlewares/checkAdmin");
-const CronManager   = require('./_helper/cronManager.helper');
+// const CronManager   = require('./_helper/cronManager.helper');
 require("./config/passport");
 
 const isProduction = process.env.NODE_ENV === "production";
