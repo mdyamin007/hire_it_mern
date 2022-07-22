@@ -12,6 +12,7 @@ module.exports = {
             var n = payload.n;
             
             var firstNameList = ['Bhavesh', 'Nitin', 'Manish', 'Rahul', 'Raj', 'Vijay'];
+            var lastNameList = ['Vavadiya', 'Shinde', 'Sharma', 'Malhotra', 'Pawar', 'Iyer'];
 
             var skillList = [
                 ["Skill1", "S2"],
@@ -64,13 +65,12 @@ module.exports = {
                     sector: sectorOptionsList[sectorOptionsListIndex],
                     subSector: "",
                     hr_name: firstNameList[firstNameIndex],
-                    email: "",
+                    email: email,
                     salary_range: "",
                     certifications: certificationList[certificationListIndex],
                     skills: skillList[lastNameIndex],
                     education: educationList[educationListIndex],
                     major: "",
-                    email: email,
                     country: "INDIA",
                     major: "",
                 };
