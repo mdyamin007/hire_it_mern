@@ -61,14 +61,14 @@ const jobCVSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    skillCode:{
-      type:String
-  
+    skillCode: {
+        type: String
+
     },
-    certificationCode:{
-      type:String
-     
-    }, 
+    certificationCode: {
+        type: String
+
+    },
     major: {
         type: String,
         required: true,
@@ -76,20 +76,24 @@ const jobCVSchema = new mongoose.Schema({
     jobId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Job_Posts"
-    },  
+    },
     matchStartDate: {
-      type: Date,
-      default: null,
-      index:true,
+        type: Date,
+        default: null,
+        index: true,
     },
     matchEndDate: {
-      type: Date,
-      default: null
+        type: Date,
+        default: null
+    },
+    customUpdatedAt: {
+        type: Date,
+        default: null
     }
 },
-{
-  timestamps: true
-});
+    {
+        timestamps: true
+    });
 
 jobCVSchema.virtual("id").get(function () {
     return this._id.toHexString();
@@ -101,48 +105,67 @@ jobCVSchema.set("toJSON", {
 
 jobCVSchema.pre(/^save|findOneAndUpdate$/, true, async function (next, done) {
     try {
+
         
+
         const skillList = this.skills.toString().split(',');
         console.log(skillList);
 
-        var matchSkill = skillList.map(i=>skillOptions.find(j=>i === j.value))
+        var matchSkill = skillList.map(i => skillOptions.find(j => i === j.value))
         // [ {value: 'Teamwork', label: 'Teamwork', code: 'A'},{value: 'Legal', label: 'Legal', code: 'B'}]
-        matchSkill = matchSkill.filter(function( element ) {
+        matchSkill = matchSkill.filter(function (element) {
             return element !== undefined;
-         });
-        console.log("matchSkill==>",matchSkill);
-        console.log("matchSkill==>",matchSkill.length);
-        if(matchSkill.length>0){
-            console.log("log inside" );
-            const temp = matchSkill.sort((a,b)=> a.code.length - b.code.length || a.code.charCodeAt(0) - b.code.charCodeAt(0)).map(i=>`:${i.code}:`).join("")
-            console.log("temp",temp);
+        });
+        console.log("matchSkill==>", matchSkill);
+        console.log("matchSkill==>", matchSkill.length);
+        if (matchSkill.length > 0) {
+            console.log("log inside");
+            const temp = matchSkill.sort((a, b) => a.code.length - b.code.length || a.code.charCodeAt(0) - b.code.charCodeAt(0)).map(i => `:${i.code}:`).join("")
+            console.log("temp", temp);
 
-            this.skillCode =temp;
+            this.skillCode = temp;
         }
         console.log(this.certifications);
         const certificationList = this.certifications.toString().split(',');
         console.log(certificationList);
 
-        var matchcertifications = certificationList.map(i=>certificationOptions.find(j=>i === j.value));
-        matchcertifications = matchcertifications.filter(function( element ) {
+        var matchcertifications = certificationList.map(i => certificationOptions.find(j => i === j.value));
+        matchcertifications = matchcertifications.filter(function (element) {
             return element !== undefined;
-         });
-        
-        console.log("matchSkill==>",matchcertifications);
-        console.log("matchSkill==>",matchcertifications.length);
-        if(matchcertifications.length>0){
-            console.log("log inside" );
-            const temp = matchcertifications.sort((a,b)=> a.code.length - b.code.length || a.code.charCodeAt(0) - b.code.charCodeAt(0)).map(i=>`:${i.code}:`).join("")
-            console.log("temp",temp);
+        });
 
-            this.certificationCode =temp;
+        console.log("matchSkill==>", matchcertifications);
+        console.log("matchSkill==>", matchcertifications.length);
+        if (matchcertifications.length > 0) {
+            console.log("log inside");
+            const temp = matchcertifications.sort((a, b) => a.code.length - b.code.length || a.code.charCodeAt(0) - b.code.charCodeAt(0)).map(i => `:${i.code}:`).join("")
+            console.log("temp", temp);
+
+            this.certificationCode = temp;
         }
-      done();
-      next();
+        if (this.isNew) {
+
+            this.customUpdatedAt = this.createdAt;
+        } else {
+            var _query = {
+                '_id':this._id,
+                'skills': this.skills, 
+                'certifications':  this.certifications,
+                'education': this.education
+              };
+              const record = await mongoose.models["jobCV"].findOne(_query);
+            if(record){
+                this.customUpdatedAt = new Date();
+            }
+            
+        }
+        done();
+        next();
     }
     catch (err) {
-        console.log(err); done(err); next(); }
-  });
+        console.log(err); done(err); next();
+    }
+});
 
 const jobCV = mongoose.model("jobCV", jobCVSchema);
 

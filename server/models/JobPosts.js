@@ -73,7 +73,6 @@ const JobPostSchema = new mongoose.Schema({
     type: String,
 
   },
-
   matchStartDate: {
     type: Date,
     default: null,
@@ -82,6 +81,10 @@ const JobPostSchema = new mongoose.Schema({
   matchEndDate: {
     type: Date,
     default: null
+  },
+  customUpdatedAt: {
+      type: Date,
+      default: null
   }
 },
   {
@@ -133,6 +136,22 @@ JobPostSchema.pre(/^save|findOneAndUpdate$/, true, async function (next, done) {
 
       this.certificationCode = temp;
     }
+    if (this.isNew) {
+
+      this.customUpdatedAt = this.createdAt; //new Date();
+  } else {
+      var _query = {
+        '_id':this._id,
+          'skills': this.skills, 
+          'certifications':  this.certifications,
+          'education': this.education
+        };
+        const record = await mongoose.models["Job_Posts"].findOne(_query);
+      if(record){
+          this.customUpdatedAt = new Date();
+      }
+      
+  }
     done();
     next();
   }

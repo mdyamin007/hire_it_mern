@@ -72,7 +72,7 @@ module.exports = {
 
         let matchFieldCount = 0;
         let skillMatchCount = 0;
-        let educationMatchCount=0;
+        let educationMatchCount = 0;
         let certificationMatchCount = 0;
         let skillScore = 0;
         let certificationScore = 0;
@@ -109,9 +109,9 @@ module.exports = {
           certificationScore = (certificationMatchCount * 100) / certificatoinReqCount;
         }
         matchFieldCount++;
-        if(cvObj.educateducation == jobPosts.education){
+        if (cvObj.educateducation == jobPosts.education) {
           educationMatchCount = 100;
-        }else{
+        } else {
           educationMatchCount = 50;
         }
 
@@ -144,7 +144,7 @@ module.exports = {
     } catch (err) {
       console.log("CATCH ::fn[fetchAggregateDatatableRecords]:::>");
       console.error(err);
-      return {err: err};
+      return { err: err };
     }
   },
   matchJob: async (applicationId) => {
@@ -214,7 +214,7 @@ module.exports = {
 
         let matchFieldCount = 0;
         let skillMatchCount = 0;
-        let educationMatchCount=0;
+        let educationMatchCount = 0;
         let certificationMatchCount = 0;
         let skillScore = 0;
         let certificationScore = 0;
@@ -257,9 +257,9 @@ module.exports = {
         }
 
         matchFieldCount++;
-        if(jobObj.educateducation == applicationCV.education){
+        if (jobObj.educateducation == applicationCV.education) {
           educationMatchCount = 100;
-        }else{
+        } else {
           educationMatchCount = 50;
         }
 
@@ -285,11 +285,11 @@ module.exports = {
 
       console.log('End call matchJob');
       return { cvList: cvList, marcherList: marcherList };
-      
+
     } catch (err) {
       console.log("CATCH ::fn[fetchAggregateDatatableRecords]:::>");
       console.error(err);
-      return {err: err};
+      return { err: err };
     }
   },
 
@@ -298,17 +298,17 @@ module.exports = {
     const page = Number(dtReq.page);
     const limitRecord = Number(dtReq.limit || 50);
     let skipRecord = 0;
-  
-    if (page > 1){
-      skipRecord = (page-1) * limitRecord ;
+
+    if (page > 1) {
+      skipRecord = (page - 1) * limitRecord;
     }
-   
+
     const responseJson = {
       recordsFiltered: 0,
       recordsTotal: 0,
       data: []
     };
-    
+
     try {
       if (dtReq.search && dtReq.search.value !== "" && fieldNames.length > 0) {
         const regex = new RegExp(dtReq.search.value, "i");
@@ -352,6 +352,144 @@ module.exports = {
       console.log("CATCH ::fn[fetchDatatableRecords]:::>");
       console.error(err);
       return callback(err, responseJson);
+    }
+  },
+
+  cronCvMatch: async (jobPostList) => {
+    try {
+      for (jobPosts of jobPostList) {
+        let whereQuery = {};
+        var jobId = jobPosts._id
+        console.log("job_id: ", jobPosts._id);
+        console.log("jobSearchStartdate:", jobPosts.matchStartDate);
+        console.log("job_id: ", jobPosts.updatedAt);
+
+        jobPosts.skillCode = jobPosts.skillCode ? jobPosts.skillCode : '';
+        let skillRegex = jobPosts.skillCode.replace(/::/g, ":|:");
+        let skillArray = skillRegex.replace(/:/g, "").split('|');
+        if (skillArray.length == 1 && skillArray[0] == '') {
+          skillRegex = '';
+          skillArray = [];
+        }
+
+        jobPosts.certificationCode = jobPosts.certificationCode ? jobPosts.certificationCode : '';
+        let certificationsRegex = jobPosts.certificationCode.replace(/::/g, ":|:");
+        let certificationsArray = certificationsRegex.replace(/:/g, "").split('|');
+        if (certificationsArray.length == 1 && certificationsArray[0] == '') {
+          certificationsRegex = '';
+          certificationsArray = [];
+        }
+
+        let skillReqCount = skillArray.length;
+        let certificatoinReqCount = certificationsArray.length;
+
+        let orCriteria = [];
+        if (skillReqCount > 0) {
+          orCriteria.push({ skillCode: { $regex: skillRegex } });
+        }
+        if (certificatoinReqCount > 0) {
+          orCriteria.push({ certificationCode: { $regex: certificationsRegex } });
+        }
+        if (orCriteria.length > 0) {
+          whereQuery = {
+            $or: orCriteria
+          };
+        }
+
+        let cvList = [];
+        let marcherList = [];
+
+        if (jobPosts.matchStartDate) {
+          whereQuery.createdAt = { $gte: jobPosts.matchStartDate };
+        }
+        console.log(whereQuery);
+        cvList = await JOBCVMODEL.find(whereQuery).sort({ 'createdAt': -1 });
+        // console.log("cvList: ",cvList);
+        if (cvList) {
+          var firstRecord = await JOBCVMODEL.find().sort({ 'createdAt': -1 }).limit(1);
+          if (firstRecord.length > 0) {
+            searchStartDate = firstRecord[0].updatedAt;
+          }
+
+          for (const cvObj of cvList) {
+
+            let matchFieldCount = 0;
+            let skillMatchCount = 0;
+            let educationMatchCount = 0;
+            let certificationMatchCount = 0;
+            let skillScore = 0;
+            let certificationScore = 0;
+            let applicantScore = 0;
+            cvObj.skillCode = cvObj.skillCode ? cvObj.skillCode : '';
+            let cvSkillArray = cvObj.skillCode.replace(/::/g, "|").replace(/:/g, "").split('|');
+            cvObj.certificationCode = cvObj.certificationCode ? cvObj.certificationCode : '';
+            let cvCertificationsArray = cvObj.certificationCode.replace(/::/g, "|").replace(/:/g, "").split('|');
+
+            if (cvSkillArray.length == 1 && cvSkillArray[0] == '') {
+              cvSkillArray = [];
+            }
+            if (cvCertificationsArray.length == 1 && cvCertificationsArray[0] == '') {
+              cvCertificationsArray = [];
+            }
+
+            if (skillReqCount > 0) {
+              matchFieldCount++;
+              for (let i = 0; i < skillArray.length; i++) {
+                if (cvSkillArray.indexOf(skillArray[i]) > -1) {
+                  skillMatchCount++;
+                }
+              }
+              skillScore = (skillMatchCount * 100) / skillReqCount;
+            }
+
+            if (certificatoinReqCount > 0) {
+              matchFieldCount++;
+              for (let i = 0; i < certificationsArray.length; i++) {
+                if (cvCertificationsArray.indexOf(certificationsArray[i]) > -1) {
+                  certificationMatchCount++;
+                }
+              }
+              certificationScore = (certificationMatchCount * 100) / certificatoinReqCount;
+            }
+            matchFieldCount++;
+            if (cvObj.educateducation == jobPosts.education) {
+              educationMatchCount = 100;
+            } else {
+              educationMatchCount = 50;
+            }
+
+
+            applicantScore = (skillScore + certificationScore + educationMatchCount) / matchFieldCount;
+
+            var matcherObject = {
+              "jobId": jobId,
+              "applicationId": cvObj._id,
+              "skillScore": skillScore,
+              "certificationScore": certificationScore,
+              "educationScore": educationMatchCount,
+              "matchFieldCount": matchFieldCount,
+              "score": applicantScore
+            };
+
+            console.log(matcherObject);
+            console.log(skillArray);
+            console.log(cvSkillArray);
+            console.log(matchFieldCount, skillMatchCount, certificationMatchCount, skillScore, certificationScore, applicantScore);
+            matcherObject = await Profile_MatcherModel.updateOne({ "jobId": jobId, "applicationId": cvObj._id }, { $set: matcherObject }, { upsert: true, new: true });
+            marcherList.push(matcherObject);
+          }
+          var jpbUpdateFields = { $set: { matchStartDate: searchStartDate } };
+          console.log("jpbUpdateFields : ", jpbUpdateFields);
+          await JOBPOSTSMODEL.updateOne({ _id: jobId }, jpbUpdateFields);
+        } else {
+          console.log("No Records Found");
+        }
+      }
+
+    } catch (err) {
+      console.log("CATCH ::fn[Cron Cv_Match_Wtih_Job Error occur]:::>");
+      console.error(err);
+
     }
   }
 };
