@@ -4,10 +4,16 @@ const MATCHHELPER = require("../_helper/match.helper");
 const cvUpload = async (req, res) => {
   try {
     let cv = req.body;
+    Object.entries(cv).forEach(([key, value]) => {
+      cv = {
+        ...cv,
+        [key]: JSON.parse(value),
+      };
+    });
     cv = {
       ...cv,
-      cv: req.file.path
-    }
+      cv: req.file.path,
+    };
     const createdCv = await CV_UploadService.upLoadCv(cv);
     await MATCHHELPER.matchJob(createdCv._id);
     res.status(201).json({
@@ -87,5 +93,5 @@ module.exports = {
   findAllCv,
   updateCv,
   deleteCv,
-  findById
+  findById,
 };

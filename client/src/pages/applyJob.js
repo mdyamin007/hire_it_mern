@@ -63,12 +63,12 @@ function ApplyJob() {
     // console.log(data)
     const formData = new FormData();
     for (let key in data) {
-      formData.append(key, data[key]);
+      formData.append(key, JSON.stringify(data[key]));
     }
     formData.append("cv", cv);
     // console.log(formData);
     dispatch(uploadApplication(formData));
-    formData.append("jobId", jobId);
+    formData.append("jobId", JSON.stringify(jobId));
     dispatch(applyForJob(formData));
     toast.success("Submitted successfully!");
     navigate("/");
