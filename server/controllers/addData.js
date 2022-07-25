@@ -1,14 +1,15 @@
 const DUMMYDATAADDHELPER = require("../_helper/dummyData.helper");
+const MATCHHELPER = require("../_helper/match.helper");
 
 const addDummyJobs = async (req, res) => {
     try {
         var payload = req.body;
-        const findJobMatch = await DUMMYDATAADDHELPER.addDummyJobs(payload);
+        const jobDescription = await DUMMYDATAADDHELPER.addDummyJobs(payload);
+        // MATCHHELPER.matchCV(jobDescription._id);
         // console.log(findJobMatch);
         res.status(200).json({
-            message: "Match Cv with Job successfully ",
-            jobDescriptionId: jobDescriptionId,
-            findJobMatch: findJobMatch,
+            message: "Successfully Add Jobs",
+            jobDescription: jobDescription,
         });
     } catch (err) {
         res.status(500).json({
@@ -20,15 +21,15 @@ const addDummyJobs = async (req, res) => {
 const addDummyCvs = async (req, res) => {
     try {
         var payload = req.body;
-        const findJobMatch = await DUMMYDATAADDHELPER.addDummyCvs(
+        const application = await DUMMYDATAADDHELPER.addDummyCvs(
             payload,
         );
+        // MATCHHELPER.matchJob(application._id);
 
         // console.log(findJobMatch);
         res.status(200).json({
-            message: "Match Cv with Job successfully ",
-            applicationId: applicationId,
-            findJobMatch: findJobMatch,
+            message: "Successfully Add CVs",
+            application: application,
         });
     } catch (err) {
         res.status(500).json({

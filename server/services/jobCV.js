@@ -29,7 +29,7 @@ const findById = async (applicationId) => {
 };
 
 const findMany = async (filter) => {
-    const found = await jobCV.find({jobId: filter})
+    const found = await jobCV.find({ jobId: filter })
     return found
 }
 

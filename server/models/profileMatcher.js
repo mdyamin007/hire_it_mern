@@ -6,13 +6,13 @@ const profileMatcherSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     required: true,
     ref: 'Job_Posts',
-    index:true,
+    index: true,
   },
   applicationId: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,
     ref: 'jobCV',
-    index:true,
+    index: true,
   },
   skillScore: {
     type: Number,
@@ -33,7 +33,7 @@ const profileMatcherSchema = new mongoose.Schema({
   score: {
     type: Number,
     required: true,
-    index:true,
+    index: true,
   }
 }, {
   timestamps: true
