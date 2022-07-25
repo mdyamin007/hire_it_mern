@@ -108,7 +108,8 @@ jobCVSchema.pre(/^save|findOneAndUpdate$/, true, async function (next, done) {
 
         
 
-        const skillList = this.skills.toString().split(',');
+        // const skillList = this.skills.toString().split(',');
+        const skillList = this.skills;
         console.log(skillList);
 
         var matchSkill = skillList.map(i => skillOptions.find(j => i === j.value))
@@ -126,7 +127,8 @@ jobCVSchema.pre(/^save|findOneAndUpdate$/, true, async function (next, done) {
             this.skillCode = temp;
         }
         console.log(this.certifications);
-        const certificationList = this.certifications.toString().split(',');
+        // const certificationList = this.certifications.toString().split(',');
+        const certificationList = this.certifications;
         console.log(certificationList);
 
         var matchcertifications = certificationList.map(i => certificationOptions.find(j => i === j.value));
