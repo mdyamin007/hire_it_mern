@@ -78,19 +78,19 @@ const getMatchList = async (req, res) => {
   MATCHHELPER.fetchDatatableRecords(payload, modleObj, searchFields, conditionQuery, projectionQuery, sortingQuery, populateQuery, function (err, data) {
     if (err) res.status(300).json({ success: false, message: "Something went wrong.", error: err.message, data: [] });
     const JsonData = JSON.parse(JSON.stringify(data));
-    return res.status(300).json(JsonData);
+    return res.status(200).json(JsonData);
   });
 
 }
 
 const runPastCvMatchWtihJobCron = async (req, res) => {
-  cronManager.PastCvMatchWtihJobCron();
+  await cronManager.PastCvMatchWtihJobCron();
     res.status(200).json({
       message: "Success"
     });
 }
 const runFutureCvMatchWtihJobCron = async (req, res) => {
-  cronManager.FutureCvMatchWtihJobCron();
+  await cronManager.FutureCvMatchWtihJobCron();
   res.status(200).json({
     message: "Success"
   });

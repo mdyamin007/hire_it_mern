@@ -11,6 +11,7 @@ import AdminDashboard from "./pages/admin_dashboard";
 import Companies from "./pages/companies";
 import JobPosts from "./pages/job_posts";
 import JobDetails from "./pages/job_details";
+import CVList from "./pages/cvList";
 import PrivateRouteUser from "./components/PrivateRouteUser";
 import Submit_cv from "./pages/submit_cv";
 import Applications from "./pages/applications";
@@ -31,6 +32,7 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/verify/:userId/:tokenId" element={<Verification />} />
             <Route path="/job_details/:jobPostId" element={<JobDetails />} />
+            <Route path="/auto_cv_match_list/:jobPostId" element={<CVList />} />
             <Route element={<PrivateRouteUser />}>
               <Route path="submit_cv" element={<Submit_cv />} />
               <Route path="apply/:jobId" element={<ApplyJob />} />
