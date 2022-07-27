@@ -52,8 +52,8 @@ agenda.define("Future_Cv_Match_WtihJob", async (job, done) => {
 //     done();
 // });
 agenda.on("ready", () => {
-    //agenda.every("3 minutes", "Past_Cv_Match_WtihJob");
-    //agenda.every("5 minutes", "Future_Cv_Match_WtihJob");
+    agenda.every("3 minutes", "Past_Cv_Match_WtihJob");
+    agenda.every("5 minutes", "Future_Cv_Match_WtihJob");
     // agenda.every("2 minutes", "Test_Cron_Run");
     agenda.start();
 });
