@@ -7,6 +7,7 @@ import AdobeLogo from "../assets/adobe_reader.png";
 import { BASE_URL } from "../api";
 
 function ApplicationDetails() {
+    const { user } = useSelector(state => state.auth)
     const { applicationId } = useParams();
 
     const dispatch = useDispatch();
@@ -65,8 +66,7 @@ function ApplicationDetails() {
                 </div>
             )}
             
-        
-            <div className="container mx-auto my-10">
+            {user && user.userType === "admin" && (<div className="container mx-auto my-10">
                 <h2 class="text-4xl text-center font-semibold italic text-gray-700">Auto Matched Jobs</h2>
                 <div className="grid grid-cols-3 my-10 gap-4">
                     {job_posts &&
@@ -85,7 +85,8 @@ function ApplicationDetails() {
                             </Link>
                         ))}
                 </div>
-            </div>
+            </div>)}
+            
         </div>
     );
 }

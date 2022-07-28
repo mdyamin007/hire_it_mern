@@ -5,6 +5,7 @@ import { getAllJobPosts } from "../../redux/features/jobSlice";
 import Button from "../Elements/Button";
 
 const JobList = () => {
+    const { user } = useSelector(state => state.auth)
     const dispatch = useDispatch();
     const { job_posts } = useSelector((state) => state.jobPosts);
 
@@ -32,9 +33,10 @@ const JobList = () => {
                                 <Link to={`/job_details/${jobPost._id}`} className="bg-blue-500 text-white text-center  py-1">
                                     Apply
                                 </Link>
-                                <Link to={`/auto_cv_match_list/${jobPost._id}`} className="bg-blue-500 text-white text-center  py-1">
+                                {user && user.userType === "admin" && (<Link to={`/auto_cv_match_list/${jobPost._id}`} className="bg-blue-500 text-white text-center  py-1">
                                     View Auto Match
-                                </Link>
+                                </Link>)}
+                                
                             </div>
                         </div>
                         // </Link>

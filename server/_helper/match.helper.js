@@ -110,7 +110,7 @@ module.exports = {
           certificationScore = (certificationMatchCount * 100) / certificatoinReqCount;
         }
         matchFieldCount++;
-        if (cvObj.educateducation == jobPosts.education) {
+        if (cvObj.education == jobPosts.education) {
           educationMatchCount = 100;
         } else {
           educationMatchCount = 50;
@@ -258,7 +258,7 @@ module.exports = {
         }
 
         matchFieldCount++;
-        if (jobObj.educateducation == applicationCV.education) {
+        if (jobObj.education == applicationCV.education) {
           educationMatchCount = 100;
         } else {
           educationMatchCount = 50;
@@ -468,7 +468,7 @@ module.exports = {
             certificationScore = (certificationMatchCount * 100) / certificatoinReqCount;
           }
           matchFieldCount++;
-          if (cvObj.educateducation == jobPosts.education) {
+          if (cvObj.education == jobPosts.education) {
             educationMatchCount = 100;
           } else {
             educationMatchCount = 50;
@@ -625,7 +625,7 @@ module.exports = {
             certificationScore = (certificationMatchCount * 100) / certificatoinReqCount;
           }
           matchFieldCount++;
-          if (cvObj.educateducation == jobPosts.education) {
+          if (cvObj.education == jobPosts.education) {
             educationMatchCount = 100;
           } else {
             educationMatchCount = 50;

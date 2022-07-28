@@ -32,7 +32,7 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/verify/:userId/:tokenId" element={<Verification />} />
             <Route path="/job_details/:jobPostId" element={<JobDetails />} />
-            <Route path="/auto_cv_match_list/:jobPostId" element={<CVList />} />
+            {/* <Route path="/auto_cv_match_list/:jobPostId" element={<CVList />} /> */}
             <Route element={<PrivateRouteUser />}>
               <Route path="submit_cv" element={<Submit_cv />} />
               <Route path="apply/:jobId" element={<ApplyJob />} />
@@ -41,6 +41,7 @@ function App() {
               <Route path="/admin_dashboard" element={<AdminDashboard />} />
               <Route path="/companies" element={<Companies />} />
               <Route path="/job_posts" element={<JobPosts />} />
+              <Route path="/auto_cv_match_list/:jobPostId" element={<CVList />} />
               <Route path="/applications" element={<Applications />} />
               <Route
                 path="/applications/:applicationId"
