@@ -5,19 +5,39 @@ const profileMatcherSchema = new mongoose.Schema({
   jobId: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,
-    ref: 'Job_Posts'
+    ref: 'Job_Posts',
+    index: true,
   },
   applicationId: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,
-    ref: 'CV_Upload'
+    ref: 'jobCV',
+    index: true,
   },
- score: {
+  skillScore: {
     type: Number,
     required: true
-  }},{
-    timestamps: true
-  });
+  },
+  certificationScore: {
+    type: Number,
+    required: true
+  },
+  educationScore: {
+    type: Number,
+    required: true
+  },
+  matchFieldCount: {
+    type: Number,
+    required: true
+  },
+  score: {
+    type: Number,
+    required: true,
+    index: true,
+  }
+}, {
+  timestamps: true
+});
 
 profileMatcherSchema.virtual("id").get(function () {
   return this._id.toHexString();

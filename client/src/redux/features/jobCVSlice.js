@@ -4,6 +4,7 @@ import apiAxios from "../../api";
 const initialState = {
   applications: [],
   application: null,
+  job_posts: []
 };
 
 export const getAllCVForTheJob = createAsyncThunk(
@@ -35,6 +36,16 @@ export const getCVByApplicationId = createAsyncThunk(
   }
 );
 
+export const getJobPostsByApplicationId = createAsyncThunk("jobCV/getMatch", async (data, thunkAPI) => {
+  try {
+      const res = await apiAxios("/api/v1/profileMatcher/getMatchList", "POST", data);
+      return res.data;
+  } catch (error) {
+      console.log(error)
+      return thunkAPI.rejectWithValue(error.response.data);
+  }
+});
+
 const jobCVSlice = createSlice({
   name: "jobCV",
   initialState,
@@ -45,6 +56,9 @@ const jobCVSlice = createSlice({
     },
     [getCVByApplicationId.fulfilled]: (state, action) => {
       state.application = action.payload;
+    },
+    [getJobPostsByApplicationId.fulfilled]: (state, action) => {
+      state.job_posts = action.payload;
     },
   },
 });

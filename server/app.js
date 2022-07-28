@@ -11,7 +11,9 @@ const jobCVRouter = require("./routers/jobCV")
 const companiesRouter = require("./routers/companies");
 const jobsRouter = require("./routers/jobPosts");
 const profileMatcherRouter = require("./routers/profileMacther");
+const dummyAddDataRouter = require("./routers/addData");
 const checkAdmin = require("./middlewares/checkAdmin");
+const CronManager   = require('./_helper/cronManager.helper');
 require("./config/passport");
 
 const isProduction = process.env.NODE_ENV === "production";
@@ -56,6 +58,7 @@ app.use("/api/v1/jobCV", passport.authenticate("jwt", { session: false }), jobCV
 app.use("/api/v1/companies", checkAdmin, companiesRouter);
 app.use("/api/v1/job_posts", jobsRouter);
 app.use("/api/v1/profileMatcher", profileMatcherRouter);
+app.use("/api/v1/addDummyData", dummyAddDataRouter);
 
 
 /// catch 404 and forward to error handler

@@ -1,4 +1,4 @@
-const CV_UploadService = require("../services/cvUpload");
+const JobCVService = require("../services/jobCV");
 const MATCHHELPER = require("../_helper/match.helper");
 
 const cvUpload = async (req, res) => {
@@ -12,10 +12,12 @@ const cvUpload = async (req, res) => {
     });
     cv = {
       ...cv,
-      cv: req.file.path,
-    };
-    const createdCv = await CV_UploadService.upLoadCv(cv);
-    await MATCHHELPER.matchJob(createdCv._id);
+      cv: req.file.path
+    }
+    const createdCv = await JobCVService.createJobCV(cv);
+    console.log('Before call matchJob');
+    MATCHHELPER.matchJob(createdCv._id);
+    console.log('After call matchJob');
     res.status(201).json({
       message: "CV created successfully",
       cv: createdCv,
@@ -29,7 +31,7 @@ const cvUpload = async (req, res) => {
 
 const findAllCv = async (req, res) => {
   try {
-    const cv = await CV_UploadService.findAllCv();
+    const cv = await JobCVService.findAllJobCV();
     res.status(200).json({
       message: "CV fetched successfully",
       cv: cv,
@@ -45,7 +47,7 @@ const updateCv = async (req, res) => {
   try {
     const applicationId = req.params.applicationId;
     const cv = req.body;
-    const updatedCv = await CV_UploadService.updateCv(applicationId, cv);
+    const updatedCv = await JobCVService.updateJobCV(applicationId, cv);
     await MATCHHELPER.matchJob(updatedCv._id);
     res.status(200).json({
       message: "CV updated successfully",
@@ -61,7 +63,7 @@ const updateCv = async (req, res) => {
 const deleteCv = async (req, res) => {
   try {
     const applicationId = req.params.applicationId;
-    const deletedCv = await CV_UploadService.deleteCv(applicationId);
+    const deletedCv = await JobCVService.deleteJobCV(applicationId);
     res.status(200).json({
       message: "CV deleted successfully",
       cv: deletedCv,
@@ -76,7 +78,7 @@ const deleteCv = async (req, res) => {
 const findById = async (req, res) => {
   try {
     const applicationId = req.params.applicationId;
-    const data = await CV_UploadService.findById(applicationId);
+    const data = await JobCVService.findById(applicationId);
     res.status(200).json({
       message: "CV fetched successfully",
       cv: data,

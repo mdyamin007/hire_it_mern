@@ -17,6 +17,17 @@ router
     .route("/getMatchList")
     .post(profileMatcherController.getMatchList);
 
+
+// To test cron
+router
+.route("/runPastCvMatchWtihJobCron")
+.get(profileMatcherController.runPastCvMatchWtihJobCron);
+
+// To test cron
+router
+    .route("/runFutureCvMatchWtihJobCron")
+    .get(profileMatcherController.runFutureCvMatchWtihJobCron);
+
 // router.get('/getMatchList/',profileMatcherController.getMatchList);
 
 module.exports = router; // end of router;

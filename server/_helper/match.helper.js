@@ -1,6 +1,7 @@
 const JOBPOSTSMODEL = require("../models/JobPosts");
-const CVUPLOADMODEL = require("../models/CV_Upload");
+const JOBCVMODEL = require("../models/jobCV");
 const Profile_MatcherModel = require("../models/profileMatcher");
+const moment = require("moment");
 
 module.exports = {
 
@@ -10,13 +11,14 @@ module.exports = {
       var searchStartDate = null;
       var searchEndDate = null;
       var whereQuery = {};
-      var firstRecord = await CVUPLOADMODEL.find({ sort: { 'createdAt': -1 } }).limit(1);
-      var lastRecord = await CVUPLOADMODEL.find({ sort: { 'createdAt': -1 } }).limit(1).skip(100);
+      var firstRecord = await JOBCVMODEL.find().sort({ 'customUpdatedAt': -1 }).limit(1);
+      var lastRecord = await JOBCVMODEL.find().sort({ 'customUpdatedAt': -1 }).limit(1).skip(100);
+
       if (firstRecord.length > 0) {
-        searchStartDate = firstRecord.updatedAt;
+        searchStartDate = firstRecord[0].updatedAt;
       }
       if (lastRecord.length > 0) {
-        searchEndDate = lastRecord.updatedAt;
+        searchEndDate = lastRecord[0].updatedAt;
       }
 
       var jobPosts = await JOBPOSTSMODEL.findById({ _id: jobId });
@@ -65,14 +67,13 @@ module.exports = {
       } else if (searchEndDate) {
         whereQuery.updatedAt = { $gte: searchEndDate };
       }
-      cvList = await CVUPLOADMODEL.find(whereQuery).sort({ 'createdAt': -1 });
+      cvList = await JOBCVMODEL.find(whereQuery).sort({ 'customUpdatedAt': -1 });
 
-      var breakCount = 0;
       for (const cvObj of cvList) {
 
         let matchFieldCount = 0;
         let skillMatchCount = 0;
-        let educationMatchCount=0;
+        let educationMatchCount = 0;
         let certificationMatchCount = 0;
         let skillScore = 0;
         let certificationScore = 0;
@@ -108,19 +109,23 @@ module.exports = {
           }
           certificationScore = (certificationMatchCount * 100) / certificatoinReqCount;
         }
-        if(cvObj.educateducation == jobPosts.education){
-          matchFieldCount++
+        matchFieldCount++;
+        if (cvObj.education == jobPosts.education) {
           educationMatchCount = 100;
-        }else{
+        } else {
           educationMatchCount = 50;
         }
 
 
-        applicantScore = (skillScore + certificationScore) / matchFieldCount;
+        applicantScore = (skillScore + certificationScore + educationMatchCount) / matchFieldCount;
 
         var matcherObject = {
           "jobId": jobId,
           "applicationId": cvObj._id,
+          "skillScore": skillScore,
+          "certificationScore": certificationScore,
+          "educationScore": educationMatchCount,
+          "matchFieldCount": matchFieldCount,
           "score": applicantScore
         };
 
@@ -130,39 +135,35 @@ module.exports = {
         console.log(matchFieldCount, skillMatchCount, certificationMatchCount, skillScore, certificationScore, applicantScore);
         matcherObject = await Profile_MatcherModel.updateOne({ "jobId": jobId, "applicationId": cvObj._id }, { $set: matcherObject }, { upsert: true, new: true });
         marcherList.push(matcherObject);
-        if (breakCount++ >= 1) {
-          return matcherObject;;
-        }
-        // return matcherObject;
-
       }
 
       var jpbUpdateFields = { $set: { matchStartDate: searchStartDate, matchEndDate: searchEndDate } };
-      JOBPOSTSMODEL.updateOne({ _id: jobId }, jpbUpdateFields);
+      console.log("jpbUpdateFields : ", jpbUpdateFields);
+      await JOBPOSTSMODEL.updateOne({ _id: jobId }, jpbUpdateFields);
 
       return { cvList: cvList, marcherList: marcherList };
     } catch (err) {
       console.log("CATCH ::fn[fetchAggregateDatatableRecords]:::>");
       console.error(err);
-      return callback(err, null);
+      return { err: err };
     }
   },
   matchJob: async (applicationId) => {
-
+    console.log('Inside call matchJob');
     try {
       var searchStartDate = null;
       var searchEndDate = null;
       var whereQuery = {};
-      var firstRecord = await JOBPOSTSMODEL.find({ sort: { 'createdAt': -1 } }).limit(1);
-      var lastRecord = await JOBPOSTSMODEL.find({ sort: { 'createdAt': -1 } }).limit(1).skip(100);
+      var firstRecord = await JOBPOSTSMODEL.find().sort({ 'customUpdatedAt': -1 }).limit(1);
+      var lastRecord = await JOBPOSTSMODEL.find().sort({ 'customUpdatedAt': -1 }).limit(1).skip(100);
       if (firstRecord.length > 0) {
-        searchStartDate = firstRecord.updatedAt;
+        searchStartDate = firstRecord[0].updatedAt;
       }
       if (lastRecord.length > 0) {
-        searchEndDate = lastRecord.updatedAt;
+        searchEndDate = lastRecord[0].updatedAt;
       }
 
-      var applicationCV = await CVUPLOADMODEL.findById({ _id: applicationId });
+      var applicationCV = await JOBCVMODEL.findById({ _id: applicationId });
 
       applicationCV.skillCode = applicationCV.skillCode ? applicationCV.skillCode : '';
       var skillRegex = applicationCV.skillCode.replace(/::/g, ":|:");
@@ -208,14 +209,13 @@ module.exports = {
       } else if (searchEndDate) {
         whereQuery.updatedAt = { $gte: searchEndDate };
       }
-      jobList = await JOBPOSTSMODEL.find(whereQuery).sort({ 'createdAt': -1 });
+      jobList = await JOBPOSTSMODEL.find(whereQuery).sort({ 'customUpdatedAt': -1 });
 
-      var breakCount = 0;
       for (const jobObj of jobList) {
 
         let matchFieldCount = 0;
         let skillMatchCount = 0;
-        let educationMatchCount=0;
+        let educationMatchCount = 0;
         let certificationMatchCount = 0;
         let skillScore = 0;
         let certificationScore = 0;
@@ -257,62 +257,59 @@ module.exports = {
           certificationScore = (certificationMatchCount * 100) / jobCertificatoinReqCount;
         }
 
-        if(jobObj.educateducation == applicationCV.education){
-          matchFieldCount++
+        matchFieldCount++;
+        if (jobObj.education == applicationCV.education) {
           educationMatchCount = 100;
-        }else{
+        } else {
           educationMatchCount = 50;
         }
 
 
-        applicantScore = (skillScore + certificationScore) / matchFieldCount;
+        applicantScore = (skillScore + certificationScore + educationMatchCount) / matchFieldCount;
 
         var matcherObject = {
           "jobId": jobObj._id,
           "applicationId": applicationId,
+          "skillScore": skillScore,
+          "certificationScore": certificationScore,
+          "educationScore": educationMatchCount,
+          "matchFieldCount": matchFieldCount,
           "score": applicantScore
         };
 
-        console.log(matcherObject);
-        console.log(skillArray);
-        console.log(cvSkillArray);
-        console.log(matchFieldCount, skillMatchCount, certificationMatchCount, skillScore, certificationScore, applicantScore);
-        matcherObject = await Profile_MatcherModel.updateOne({ "jobId": jobId, "applicationId": cvObj._id }, { $set: matcherObject }, { upsert: true, new: true });
+        matcherObject = await Profile_MatcherModel.updateOne({ "jobId": jobObj._id, "applicationId": applicationId }, { $set: matcherObject }, { upsert: true, new: true });
         marcherList.push(matcherObject);
-        if (breakCount++ >= 1) {
-          return matcherObject;;
-        }
-        // return matcherObject;
-
       }
 
       var jpbUpdateFields = { $set: { matchStartDate: searchStartDate, matchEndDate: searchEndDate } };
-      JOBPOSTSMODEL.updateOne({ _id: jobId }, jpbUpdateFields);
+      await JOBCVMODEL.updateOne({ _id: applicationId }, jpbUpdateFields);
 
+      console.log('End call matchJob');
       return { cvList: cvList, marcherList: marcherList };
+
     } catch (err) {
       console.log("CATCH ::fn[fetchAggregateDatatableRecords]:::>");
       console.error(err);
-      return callback(err, null);
+      return { err: err };
     }
   },
 
   fetchDatatableRecords: async (dtReq, ModelObj, fieldNames, conditionQuery, projectionQuery, sortingQuery, populateQuery, callback) => {
-    const searchQuery = JSON.parse(JSON.stringify(conditionQuery)) || {};
+    const searchQuery = conditionQuery;
     const page = Number(dtReq.page);
     const limitRecord = Number(dtReq.limit || 50);
     let skipRecord = 0;
-  
-    if (page > 1){
-      skipRecord = (page-1) * limitRecord ;
+
+    if (page > 1) {
+      skipRecord = (page - 1) * limitRecord;
     }
-   
+
     const responseJson = {
       recordsFiltered: 0,
       recordsTotal: 0,
       data: []
     };
-    
+
     try {
       if (dtReq.search && dtReq.search.value !== "" && fieldNames.length > 0) {
         const regex = new RegExp(dtReq.search.value, "i");
@@ -338,10 +335,21 @@ module.exports = {
         responseJson.recordsFiltered = recordsFilteredCount;
       }
 
+      console.log('searchQuery', searchQuery);
       if (populateQuery && populateQuery.length > 0) {
-        recordsData = await ModelObj.find(searchQuery).select(projectionQuery).skip(skipRecord).limit(limitRecord).sort(sortingQuery).lean().populate(populateQuery);
+        if(page < 0){
+          recordsData = await ModelObj.find(searchQuery).select(projectionQuery).skip(skipRecord).sort(sortingQuery).lean().populate(populateQuery);
+        }else{
+          recordsData = await ModelObj.find(searchQuery).select(projectionQuery).skip(skipRecord).limit(limitRecord).sort(sortingQuery).lean().populate(populateQuery);
+        }
+        
       } else {
-        recordsData = await ModelObj.find(searchQuery).select(projectionQuery).skip(skipRecord).limit(limitRecord).sort(sortingQuery).lean();
+        if(page < 0){
+          recordsData = await ModelObj.find(searchQuery).select(projectionQuery).skip(skipRecord).sort(sortingQuery).lean();
+        }else{
+          recordsData = await ModelObj.find(searchQuery).select(projectionQuery).skip(skipRecord).limit(limitRecord).sort(sortingQuery).lean();
+        }
+        
       }
 
       if (recordsData) {
@@ -355,6 +363,314 @@ module.exports = {
       console.log("CATCH ::fn[fetchDatatableRecords]:::>");
       console.error(err);
       return callback(err, responseJson);
+    }
+  },
+
+  cronCvMatch: async (jobPostList, matchType) => {
+    try {
+      for (jobPosts of jobPostList) {
+        var currentDate = new Date();
+        let whereQuery = {};
+        var jobId = jobPosts._id;
+        //console.log("job_id: ", jobPosts._id);
+        //console.log("jobSearchStartdate:", jobPosts.matchStartDate);
+        //console.log("job_id updatedAt: ", jobPosts.updatedAt);
+
+        jobPosts.skillCode = jobPosts.skillCode ? jobPosts.skillCode : '';
+        let skillRegex = jobPosts.skillCode.replace(/::/g, ":|:");
+        let skillArray = skillRegex.replace(/:/g, "").split('|');
+        if (skillArray.length == 1 && skillArray[0] == '') {
+          skillRegex = '';
+          skillArray = [];
+        }
+
+        jobPosts.certificationCode = jobPosts.certificationCode ? jobPosts.certificationCode : '';
+        let certificationsRegex = jobPosts.certificationCode.replace(/::/g, ":|:");
+        let certificationsArray = certificationsRegex.replace(/:/g, "").split('|');
+        if (certificationsArray.length == 1 && certificationsArray[0] == '') {
+          certificationsRegex = '';
+          certificationsArray = [];
+        }
+
+        let skillReqCount = skillArray.length;
+        let certificatoinReqCount = certificationsArray.length;
+
+        let orCriteria = [];
+        if (skillReqCount > 0) {
+          orCriteria.push({ skillCode: { $regex: skillRegex } });
+        }
+        if (certificatoinReqCount > 0) {
+          orCriteria.push({ certificationCode: { $regex: certificationsRegex } });
+        }
+        if (orCriteria.length > 0) {
+          whereQuery = {
+            $or: orCriteria
+          };
+        }
+
+        let cvList = [];
+
+        
+        if(matchType == 'PAST') {
+          const endDate = moment.utc().subtract(30, "days").toISOString();
+          whereQuery.customUpdatedAt = { $gte : endDate };
+          if (jobPosts.matchEndDate) {
+            whereQuery.customUpdatedAt.$lte = jobPosts.matchEndDate;
+          }
+          cvList = await JOBCVMODEL.find(whereQuery).sort({ 'customUpdatedAt': -1 }).limit(200);
+        } else {
+          if (jobPosts.matchStartDate) {
+            whereQuery.customUpdatedAt = { $gte: jobPosts.matchStartDate };
+          }
+          cvList = await JOBCVMODEL.find(whereQuery).sort({ 'customUpdatedAt': 1 }).limit(100);
+        }
+        //console.log(whereQuery);
+        // cvList = await JOBCVMODEL.find(whereQuery).sort({ 'customUpdatedAt': -1 });
+
+        for (const cvObj of cvList) {
+
+          let matchFieldCount = 0;
+          let skillMatchCount = 0;
+          let educationMatchCount = 0;
+          let certificationMatchCount = 0;
+          let skillScore = 0;
+          let certificationScore = 0;
+          let applicantScore = 0;
+          cvObj.skillCode = cvObj.skillCode ? cvObj.skillCode : '';
+          let cvSkillArray = cvObj.skillCode.replace(/::/g, "|").replace(/:/g, "").split('|');
+          cvObj.certificationCode = cvObj.certificationCode ? cvObj.certificationCode : '';
+          let cvCertificationsArray = cvObj.certificationCode.replace(/::/g, "|").replace(/:/g, "").split('|');
+
+          if (cvSkillArray.length == 1 && cvSkillArray[0] == '') {
+            cvSkillArray = [];
+          }
+          if (cvCertificationsArray.length == 1 && cvCertificationsArray[0] == '') {
+            cvCertificationsArray = [];
+          }
+
+          if (skillReqCount > 0) {
+            matchFieldCount++;
+            for (let i = 0; i < skillArray.length; i++) {
+              if (cvSkillArray.indexOf(skillArray[i]) > -1) {
+                skillMatchCount++;
+              }
+            }
+            skillScore = (skillMatchCount * 100) / skillReqCount;
+          }
+
+          if (certificatoinReqCount > 0) {
+            matchFieldCount++;
+            for (let i = 0; i < certificationsArray.length; i++) {
+              if (cvCertificationsArray.indexOf(certificationsArray[i]) > -1) {
+                certificationMatchCount++;
+              }
+            }
+            certificationScore = (certificationMatchCount * 100) / certificatoinReqCount;
+          }
+          matchFieldCount++;
+          if (cvObj.education == jobPosts.education) {
+            educationMatchCount = 100;
+          } else {
+            educationMatchCount = 50;
+          }
+
+
+          applicantScore = (skillScore + certificationScore + educationMatchCount) / matchFieldCount;
+
+          var matcherObject = {
+            "jobId": jobId,
+            "applicationId": cvObj._id,
+            "skillScore": skillScore,
+            "certificationScore": certificationScore,
+            "educationScore": educationMatchCount,
+            "matchFieldCount": matchFieldCount,
+            "score": applicantScore
+          };
+
+          //console.log(matcherObject);
+          //console.log(skillArray);
+          //console.log(cvSkillArray);
+          //console.log(matchFieldCount, skillMatchCount, certificationMatchCount, skillScore, certificationScore, applicantScore);
+          matcherObject = await Profile_MatcherModel.updateOne({ "jobId": jobId, "applicationId": cvObj._id }, { $set: matcherObject }, { upsert: true, new: true });
+        }
+        var updateFields = {};
+        if(matchType == 'PAST') {
+          updateFields.pastSearchCompleted = true;
+          if(cvList.length > 0) {
+            var oldestCVCustomUpdatedAt = cvList[cvList.length - 1].customUpdatedAt;
+            if(oldestCVCustomUpdatedAt){
+              updateFields.matchEndDate = oldestCVCustomUpdatedAt;
+            }            
+          }
+        } else {
+          updateFields.matchStartDate = currentDate;
+          if(cvList.length > 0){
+            var newCVCustomUpdatedAt = cvList[cvList.length - 1].customUpdatedAt;
+            if(newCVCustomUpdatedAt){
+              updateFields.matchStartDate = newCVCustomUpdatedAt;
+            } 
+          }
+        }
+        //console.log("jobUpdateFields : ", updateFields);
+        await JOBPOSTSMODEL.updateOne({ _id: jobId }, { $set: updateFields});
+      }
+
+    } catch (err) {
+      console.log("CATCH ::fn[Cron Cv_Match_Wtih_Job Error occur]:::>");
+      console.error(err);
+
+    }
+  },
+
+  cronCvMatch_20220726: async (jobPostList, matchType) => {
+    try {
+      for (jobPosts of jobPostList) {
+        var currentDate = new Date();
+        let whereQuery = {};
+        var jobId = jobPosts._id;
+        //console.log("job_id: ", jobPosts._id);
+        //console.log("jobSearchStartdate:", jobPosts.matchStartDate);
+        //console.log("job_id updatedAt: ", jobPosts.updatedAt);
+
+        jobPosts.skillCode = jobPosts.skillCode ? jobPosts.skillCode : '';
+        let skillRegex = jobPosts.skillCode.replace(/::/g, ":|:");
+        let skillArray = skillRegex.replace(/:/g, "").split('|');
+        if (skillArray.length == 1 && skillArray[0] == '') {
+          skillRegex = '';
+          skillArray = [];
+        }
+
+        jobPosts.certificationCode = jobPosts.certificationCode ? jobPosts.certificationCode : '';
+        let certificationsRegex = jobPosts.certificationCode.replace(/::/g, ":|:");
+        let certificationsArray = certificationsRegex.replace(/:/g, "").split('|');
+        if (certificationsArray.length == 1 && certificationsArray[0] == '') {
+          certificationsRegex = '';
+          certificationsArray = [];
+        }
+
+        let skillReqCount = skillArray.length;
+        let certificatoinReqCount = certificationsArray.length;
+
+        let orCriteria = [];
+        if (skillReqCount > 0) {
+          orCriteria.push({ skillCode: { $regex: skillRegex } });
+        }
+        if (certificatoinReqCount > 0) {
+          orCriteria.push({ certificationCode: { $regex: certificationsRegex } });
+        }
+        if (orCriteria.length > 0) {
+          whereQuery = {
+            $or: orCriteria
+          };
+        }
+
+        let cvList = [];
+        let marcherList = [];
+
+        
+        if(matchType == 'PAST') {
+          const endDate = moment.utc().subtract(30, "days").toISOString();
+          whereQuery.customUpdatedAt = { $gte : endDate };
+          if (jobPosts.matchEndDate) {
+            whereQuery.customUpdatedAt.$lte = jobPosts.matchEndDate;
+          }
+          cvList = await JOBCVMODEL.find(whereQuery).sort({ 'customUpdatedAt': -1 }).limit(1000);
+        } else {
+          if (jobPosts.matchStartDate) {
+            whereQuery.customUpdatedAt = { $gte: jobPosts.matchStartDate };
+          }
+          cvList = await JOBCVMODEL.find(whereQuery).sort({ 'customUpdatedAt': -1 });
+        }
+        //console.log(whereQuery);
+        // cvList = await JOBCVMODEL.find(whereQuery).sort({ 'customUpdatedAt': -1 });
+
+        for (const cvObj of cvList) {
+
+          let matchFieldCount = 0;
+          let skillMatchCount = 0;
+          let educationMatchCount = 0;
+          let certificationMatchCount = 0;
+          let skillScore = 0;
+          let certificationScore = 0;
+          let applicantScore = 0;
+          cvObj.skillCode = cvObj.skillCode ? cvObj.skillCode : '';
+          let cvSkillArray = cvObj.skillCode.replace(/::/g, "|").replace(/:/g, "").split('|');
+          cvObj.certificationCode = cvObj.certificationCode ? cvObj.certificationCode : '';
+          let cvCertificationsArray = cvObj.certificationCode.replace(/::/g, "|").replace(/:/g, "").split('|');
+
+          if (cvSkillArray.length == 1 && cvSkillArray[0] == '') {
+            cvSkillArray = [];
+          }
+          if (cvCertificationsArray.length == 1 && cvCertificationsArray[0] == '') {
+            cvCertificationsArray = [];
+          }
+
+          if (skillReqCount > 0) {
+            matchFieldCount++;
+            for (let i = 0; i < skillArray.length; i++) {
+              if (cvSkillArray.indexOf(skillArray[i]) > -1) {
+                skillMatchCount++;
+              }
+            }
+            skillScore = (skillMatchCount * 100) / skillReqCount;
+          }
+
+          if (certificatoinReqCount > 0) {
+            matchFieldCount++;
+            for (let i = 0; i < certificationsArray.length; i++) {
+              if (cvCertificationsArray.indexOf(certificationsArray[i]) > -1) {
+                certificationMatchCount++;
+              }
+            }
+            certificationScore = (certificationMatchCount * 100) / certificatoinReqCount;
+          }
+          matchFieldCount++;
+          if (cvObj.education == jobPosts.education) {
+            educationMatchCount = 100;
+          } else {
+            educationMatchCount = 50;
+          }
+
+
+          applicantScore = (skillScore + certificationScore + educationMatchCount) / matchFieldCount;
+
+          var matcherObject = {
+            "jobId": jobId,
+            "applicationId": cvObj._id,
+            "skillScore": skillScore,
+            "certificationScore": certificationScore,
+            "educationScore": educationMatchCount,
+            "matchFieldCount": matchFieldCount,
+            "score": applicantScore
+          };
+
+          //console.log(matcherObject);
+          //console.log(skillArray);
+          //console.log(cvSkillArray);
+          //console.log(matchFieldCount, skillMatchCount, certificationMatchCount, skillScore, certificationScore, applicantScore);
+          matcherObject = await Profile_MatcherModel.updateOne({ "jobId": jobId, "applicationId": cvObj._id }, { $set: matcherObject }, { upsert: true, new: true });
+          marcherList.push(matcherObject);
+        }
+        var updateFields = {};
+        if(matchType == 'PAST') {
+          updateFields.pastSearchCompleted = true;
+          if(cvList.length > 0) {
+            var oldestCVCustomUpdatedAt = cvList[cvList.length - 1].customUpdatedAt;
+            if(oldestCVCustomUpdatedAt){
+              updateFields.matchEndDate = oldestCVCustomUpdatedAt;
+            }            
+          }
+        } else {
+          updateFields.matchStartDate = currentDate;
+        }
+        //console.log("jobUpdateFields : ", updateFields);
+        await JOBPOSTSMODEL.updateOne({ _id: jobId }, { $set: updateFields});
+      }
+
+    } catch (err) {
+      console.log("CATCH ::fn[Cron Cv_Match_Wtih_Job Error occur]:::>");
+      console.error(err);
+
     }
   }
 };
