@@ -417,7 +417,7 @@ module.exports = {
           if (jobPosts.matchEndDate) {
             whereQuery.customUpdatedAt.$lte = jobPosts.matchEndDate;
           }
-          cvList = await JOBCVMODEL.find(whereQuery).sort({ 'customUpdatedAt': -1 }).limit(200);
+          cvList = await JOBCVMODEL.find(whereQuery).sort({ 'customUpdatedAt': -1 }).limit(1000); // old limit is 200 
         } else {
           if (jobPosts.matchStartDate) {
             whereQuery.customUpdatedAt = { $gte: jobPosts.matchStartDate };

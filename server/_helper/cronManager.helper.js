@@ -7,6 +7,7 @@ const JOBPOSTSMODEL = require("../models/JobPosts");
 const MATCHHELPER = require("../_helper/match.helper");
 
 const PROCESS_PER_JOB = 100;
+const PROCESS_PER_PAST_JOB = 10;
 const PROCESS_PAST_DAYS_JOBS = 1;
 const PROCESS_FUTURE_DAYS_JOBS = 30;
 const MATCH_TYPE_PAST = "PAST";
@@ -62,7 +63,7 @@ agenda.on("ready", () => {
 const Past_Cv_Match_Wtih_Job =  async () => {
     const startDate = moment.utc().subtract(PROCESS_PAST_DAYS_JOBS, "days").toISOString();
 
-    var jobPostList = await JOBPOSTSMODEL.find({ customUpdatedAt: { "$gte": new Date(startDate) }, pastSearchCompleted: false }).limit(PROCESS_PER_JOB);
+    var jobPostList = await JOBPOSTSMODEL.find({ customUpdatedAt: { "$gte": new Date(startDate) }, pastSearchCompleted: false }).limit(PROCESS_PER_PAST_JOB);
     console.log("TASK-1 fn[Past_Cv_Match_WtihJob] - START ::::>");
     if (jobPostList) {
         await MATCHHELPER.cronCvMatch(jobPostList, MATCH_TYPE_PAST);
