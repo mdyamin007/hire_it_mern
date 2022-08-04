@@ -44,7 +44,7 @@ if (isProduction) {
   mongoose.connect(process.env.MONGODB_URI);
 } else {
   mongoose.connect("mongodb://127.0.0.1:27017/hire_it");
-  mongoose.set("debug", true);
+  mongoose.set("debug", false);
 }
 
 // routes

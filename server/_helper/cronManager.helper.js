@@ -16,7 +16,7 @@ const MATCH_TYPE_FUTURE = "FUTURE";
 
 agenda.define("Past_Cv_Match_WtihJob", async (job, done) => {
 
-    console.log("Past_Cv_Match_WtihJob", new Date());
+    console.log("Past_Cv_Match_WtihJob Start", new Date());
     try {
         Past_Cv_Match_Wtih_Job();
         done();
@@ -24,14 +24,13 @@ agenda.define("Past_Cv_Match_WtihJob", async (job, done) => {
         console.log("CATCH ::fn[Cron Past_Cv_Match_WtihJob Error occur]:::>");
         console.error(err);
         done();
-
     }
 });
 
 
 agenda.define("Future_Cv_Match_WtihJob", async (job, done) => {
 
-    console.log("Future_Cv_Match_WtihJob", new Date());
+    console.log("Future_Cv_Match_WtihJob Start", new Date());
     try {
         Future_Cv_Match_Wtih_Job();
         done();
@@ -68,6 +67,7 @@ const Past_Cv_Match_Wtih_Job =  async () => {
     if (jobPostList) {
         await MATCHHELPER.cronCvMatch(jobPostList, MATCH_TYPE_PAST);
     }
+    console.log("Past_Cv_Match_WtihJob End", new Date());
     console.log("TASK-1 fn[Past_Cv_Match_WtihJob] - END ::::>");
 }
 
@@ -80,6 +80,7 @@ const Future_Cv_Match_Wtih_Job =  async () => {
     if (jobPostList) {
         await MATCHHELPER.cronCvMatch(jobPostList, MATCH_TYPE_FUTURE);
     }
+    console.log("Future_Cv_Match_WtihJob End", new Date());
     console.log("TASK-1 fn[Future_Cv_Match_WtihJob] - END ::::>");
 };
 

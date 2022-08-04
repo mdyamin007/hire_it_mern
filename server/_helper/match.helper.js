@@ -54,7 +54,7 @@ module.exports = {
           $or: orCriteria
         };
       }
-      console.log(whereQuery);
+      // console.log(whereQuery);
 
 
       var cvList = [];
@@ -97,7 +97,7 @@ module.exports = {
               skillMatchCount++;
             }
           }
-          skillScore = (skillMatchCount * 100) / skillReqCount;
+         skillScore =  Math.ceil( (skillMatchCount * 100) / skillReqCount);
         }
 
         if (certificatoinReqCount > 0) {
@@ -107,7 +107,7 @@ module.exports = {
               certificationMatchCount++;
             }
           }
-          certificationScore = (certificationMatchCount * 100) / certificatoinReqCount;
+          certificationScore = Math.ceil( (certificationMatchCount * 100) / certificatoinReqCount);
         }
         matchFieldCount++;
         if (cvObj.education == jobPosts.education) {
@@ -117,7 +117,7 @@ module.exports = {
         }
 
 
-        applicantScore = (skillScore + certificationScore + educationMatchCount) / matchFieldCount;
+        applicantScore =Math.ceil((skillScore + certificationScore + educationMatchCount) / matchFieldCount);
 
         var matcherObject = {
           "jobId": jobId,
@@ -129,16 +129,16 @@ module.exports = {
           "score": applicantScore
         };
 
-        console.log(matcherObject);
-        console.log(skillArray);
-        console.log(cvSkillArray);
-        console.log(matchFieldCount, skillMatchCount, certificationMatchCount, skillScore, certificationScore, applicantScore);
+        // console.log(matcherObject);
+        // console.log(skillArray);
+        // console.log(cvSkillArray);
+        // console.log(matchFieldCount, skillMatchCount, certificationMatchCount, skillScore, certificationScore, applicantScore);
         matcherObject = await Profile_MatcherModel.updateOne({ "jobId": jobId, "applicationId": cvObj._id }, { $set: matcherObject }, { upsert: true, new: true });
         marcherList.push(matcherObject);
       }
 
       var jpbUpdateFields = { $set: { matchStartDate: searchStartDate, matchEndDate: searchEndDate } };
-      console.log("jpbUpdateFields : ", jpbUpdateFields);
+      // console.log("jpbUpdateFields : ", jpbUpdateFields);
       await JOBPOSTSMODEL.updateOne({ _id: jobId }, jpbUpdateFields);
 
       return { cvList: cvList, marcherList: marcherList };
@@ -244,7 +244,7 @@ module.exports = {
               skillMatchCount++;
             }
           }
-          skillScore = (skillMatchCount * 100) / jobSkillReqCount;
+          skillScore =  Math.ceil((skillMatchCount * 100) / jobSkillReqCount);
         }
 
         if (jobCertificatoinReqCount > 0) {
@@ -254,7 +254,7 @@ module.exports = {
               certificationMatchCount++;
             }
           }
-          certificationScore = (certificationMatchCount * 100) / jobCertificatoinReqCount;
+          certificationScore =  Math.ceil((certificationMatchCount * 100) / jobCertificatoinReqCount);
         }
 
         matchFieldCount++;
@@ -265,7 +265,7 @@ module.exports = {
         }
 
 
-        applicantScore = (skillScore + certificationScore + educationMatchCount) / matchFieldCount;
+        applicantScore = Math.ceil((skillScore + certificationScore + educationMatchCount) / matchFieldCount);
 
         var matcherObject = {
           "jobId": jobObj._id,
@@ -455,7 +455,7 @@ module.exports = {
                 skillMatchCount++;
               }
             }
-            skillScore = (skillMatchCount * 100) / skillReqCount;
+           skillScore =  Math.ceil( (skillMatchCount * 100) / skillReqCount);
           }
 
           if (certificatoinReqCount > 0) {
@@ -465,7 +465,7 @@ module.exports = {
                 certificationMatchCount++;
               }
             }
-            certificationScore = (certificationMatchCount * 100) / certificatoinReqCount;
+            certificationScore = Math.ceil( (certificationMatchCount * 100) / certificatoinReqCount);
           }
           matchFieldCount++;
           if (cvObj.education == jobPosts.education) {
@@ -475,7 +475,7 @@ module.exports = {
           }
 
 
-          applicantScore = (skillScore + certificationScore + educationMatchCount) / matchFieldCount;
+          applicantScore =Math.ceil((skillScore + certificationScore + educationMatchCount) / matchFieldCount);
 
           var matcherObject = {
             "jobId": jobId,
@@ -612,7 +612,7 @@ module.exports = {
                 skillMatchCount++;
               }
             }
-            skillScore = (skillMatchCount * 100) / skillReqCount;
+           skillScore =  Math.ceil( (skillMatchCount * 100) / skillReqCount);
           }
 
           if (certificatoinReqCount > 0) {
@@ -622,7 +622,7 @@ module.exports = {
                 certificationMatchCount++;
               }
             }
-            certificationScore = (certificationMatchCount * 100) / certificatoinReqCount;
+            certificationScore = Math.ceil( (certificationMatchCount * 100) / certificatoinReqCount);
           }
           matchFieldCount++;
           if (cvObj.education == jobPosts.education) {
@@ -632,7 +632,7 @@ module.exports = {
           }
 
 
-          applicantScore = (skillScore + certificationScore + educationMatchCount) / matchFieldCount;
+          applicantScore =Math.ceil((skillScore + certificationScore + educationMatchCount) / matchFieldCount);
 
           var matcherObject = {
             "jobId": jobId,

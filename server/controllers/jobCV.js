@@ -3,6 +3,7 @@ const MATCHHELPER = require("../_helper/match.helper");
 
 const jobCVCreate = async (req, res) => {
   try {
+   
     let cv = req.body;
     Object.entries(cv).forEach(([key, value]) => {
       cv = {
@@ -17,7 +18,8 @@ const jobCVCreate = async (req, res) => {
       cv: req.file.path,
     };
     const createdCv = await jobCVService.createJobCV(cv);
-    await MATCHHELPER.matchJob(createdCv._id);
+    MATCHHELPER.matchJob(createdCv._id);
+   
     res.status(201).json({
       message: "CV created successfully",
       cv: createdCv,
