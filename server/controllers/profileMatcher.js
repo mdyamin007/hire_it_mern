@@ -51,7 +51,7 @@ const getMatchList = async (req, res) => {
   const max_score = payload.max_score ? payload.max_score : 0;
   var projectionQuery = "-__v";
   var searchFields = [];
-  var sortingQuery = { createdAt: -1 };
+  var sortingQuery = { score: -1 };
   var conditionQuery = {};
   var populateQuery = [];
   console.log(req.body);

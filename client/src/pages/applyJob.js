@@ -67,7 +67,7 @@ function ApplyJob() {
     }
     formData.append("cv", cv);
     // console.log(formData);
-    dispatch(uploadApplication(formData));
+    // dispatch(uploadApplication(formData));
     formData.append("jobId", JSON.stringify(jobId));
     dispatch(applyForJob(formData));
     toast.success("Submitted successfully!");

@@ -7,6 +7,7 @@ const JOBPOSTSMODEL = require("../models/JobPosts");
 const MATCHHELPER = require("../_helper/match.helper");
 
 const PROCESS_PER_JOB = 100;
+const PROCESS_PER_PAST_JOB = 10;
 const PROCESS_PAST_DAYS_JOBS = 1;
 const PROCESS_FUTURE_DAYS_JOBS = 30;
 const MATCH_TYPE_PAST = "PAST";
@@ -15,7 +16,7 @@ const MATCH_TYPE_FUTURE = "FUTURE";
 
 agenda.define("Past_Cv_Match_WtihJob", async (job, done) => {
 
-    console.log("Past_Cv_Match_WtihJob", new Date());
+    console.log("Past_Cv_Match_WtihJob Start", new Date());
     try {
         Past_Cv_Match_Wtih_Job();
         done();
@@ -23,14 +24,13 @@ agenda.define("Past_Cv_Match_WtihJob", async (job, done) => {
         console.log("CATCH ::fn[Cron Past_Cv_Match_WtihJob Error occur]:::>");
         console.error(err);
         done();
-
     }
 });
 
 
 agenda.define("Future_Cv_Match_WtihJob", async (job, done) => {
 
-    console.log("Future_Cv_Match_WtihJob", new Date());
+    console.log("Future_Cv_Match_WtihJob Start", new Date());
     try {
         Future_Cv_Match_Wtih_Job();
         done();
@@ -62,11 +62,12 @@ agenda.on("ready", () => {
 const Past_Cv_Match_Wtih_Job =  async () => {
     const startDate = moment.utc().subtract(PROCESS_PAST_DAYS_JOBS, "days").toISOString();
 
-    var jobPostList = await JOBPOSTSMODEL.find({ customUpdatedAt: { "$gte": new Date(startDate) }, pastSearchCompleted: false }).limit(PROCESS_PER_JOB);
+    var jobPostList = await JOBPOSTSMODEL.find({ customUpdatedAt: { "$gte": new Date(startDate) }, pastSearchCompleted: false }).limit(PROCESS_PER_PAST_JOB);
     console.log("TASK-1 fn[Past_Cv_Match_WtihJob] - START ::::>");
     if (jobPostList) {
         await MATCHHELPER.cronCvMatch(jobPostList, MATCH_TYPE_PAST);
     }
+    console.log("Past_Cv_Match_WtihJob End", new Date());
     console.log("TASK-1 fn[Past_Cv_Match_WtihJob] - END ::::>");
 }
 
@@ -79,6 +80,7 @@ const Future_Cv_Match_Wtih_Job =  async () => {
     if (jobPostList) {
         await MATCHHELPER.cronCvMatch(jobPostList, MATCH_TYPE_FUTURE);
     }
+    console.log("Future_Cv_Match_WtihJob End", new Date());
     console.log("TASK-1 fn[Future_Cv_Match_WtihJob] - END ::::>");
 };
 
