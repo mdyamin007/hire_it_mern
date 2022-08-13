@@ -674,7 +674,7 @@ module.exports = {
   }
 };
 
-const myCV = async (jobId) => {
+const CVMatch = async (jobId) => {
 
   try {
     var searchStartDate = null;
@@ -736,7 +736,7 @@ const myCV = async (jobId) => {
     cvList = await JOBCVMODEL.find(whereQuery).sort({ 'customUpdatedAt': -1 });
 
     for (const cvObj of cvList) {
-      commonFunc(jobId, cvObj._id)
+      compareJOBAndCV(jobId, cvObj._id)
     }
 
     var jpbUpdateFields = { $set: { matchStartDate: searchStartDate, matchEndDate: searchEndDate } };
@@ -749,7 +749,7 @@ const myCV = async (jobId) => {
   }
 }
 
-const myJOB = async (applicationId) => {
+const JOBMatch = async (applicationId) => {
   try {
     var searchStartDate = null;
     var searchEndDate = null;
@@ -809,7 +809,7 @@ const myJOB = async (applicationId) => {
     jobList = await JOBPOSTSMODEL.find(whereQuery).sort({ 'customUpdatedAt': -1 });
 
     for (const jobObj of jobList) {
-      commonFunc(jobObj._id, applicationId)
+      compareJOBAndCV(jobObj._id, applicationId)
     }
 
     var jpbUpdateFields = { $set: { matchStartDate: searchStartDate, matchEndDate: searchEndDate } };
@@ -822,7 +822,7 @@ const myJOB = async (applicationId) => {
   }
 }
 
-const commonFunc = async (jobId, applicationId) => {
+const compareJOBAndCV = async (jobId, applicationId) => {
   var jobObj = await JOBPOSTSMODEL.findById(jobId)
   var applicationCV = await JOBCVMODEL.findById(applicationId);
 
@@ -907,15 +907,12 @@ const commonFunc = async (jobId, applicationId) => {
   await Profile_MatcherModel.updateOne({ "jobId": jobObj._id, "applicationId": applicationId }, { $set: matcherObject }, { upsert: true, new: true });
 }
 
-const cronCvMatch = async (jobPostList, matchType) => {
+const cronCVMatch = async (jobPostList, matchType) => {
   try {
     for (jobPosts of jobPostList) {
       var currentDate = new Date();
       let whereQuery = {};
       var jobId = jobPosts._id;
-      //console.log("job_id: ", jobPosts._id);
-      //console.log("jobSearchStartdate:", jobPosts.matchStartDate);
-      //console.log("job_id updatedAt: ", jobPosts.updatedAt);
 
       jobPosts.skillCode = jobPosts.skillCode ? jobPosts.skillCode : '';
       let skillRegex = jobPosts.skillCode.replace(/::/g, ":|:");
@@ -951,7 +948,6 @@ const cronCvMatch = async (jobPostList, matchType) => {
 
       let cvList = [];
 
-      
       if(matchType == 'PAST') {
         const endDate = moment.utc().subtract(30, "days").toISOString();
         whereQuery.customUpdatedAt = { $gte : endDate };
@@ -965,75 +961,11 @@ const cronCvMatch = async (jobPostList, matchType) => {
         }
         cvList = await JOBCVMODEL.find(whereQuery).sort({ 'customUpdatedAt': 1 }).limit(100);
       }
-      //console.log(whereQuery);
-      // cvList = await JOBCVMODEL.find(whereQuery).sort({ 'customUpdatedAt': -1 });
 
       for (const cvObj of cvList) {
-        commonFunc(jobId, cvObj._id)
-        let matchFieldCount = 0;
-        let skillMatchCount = 0;
-        let educationMatchCount = 0;
-        let certificationMatchCount = 0;
-        let skillScore = 0;
-        let certificationScore = 0;
-        let applicantScore = 0;
-        cvObj.skillCode = cvObj.skillCode ? cvObj.skillCode : '';
-        let cvSkillArray = cvObj.skillCode.replace(/::/g, "|").replace(/:/g, "").split('|');
-        cvObj.certificationCode = cvObj.certificationCode ? cvObj.certificationCode : '';
-        let cvCertificationsArray = cvObj.certificationCode.replace(/::/g, "|").replace(/:/g, "").split('|');
-
-        if (cvSkillArray.length == 1 && cvSkillArray[0] == '') {
-          cvSkillArray = [];
-        }
-        if (cvCertificationsArray.length == 1 && cvCertificationsArray[0] == '') {
-          cvCertificationsArray = [];
-        }
-
-        if (skillReqCount > 0) {
-          matchFieldCount++;
-          for (let i = 0; i < skillArray.length; i++) {
-            if (cvSkillArray.indexOf(skillArray[i]) > -1) {
-              skillMatchCount++;
-            }
-          }
-         skillScore =  Math.ceil( (skillMatchCount * 100) / skillReqCount);
-        }
-
-        if (certificatoinReqCount > 0) {
-          matchFieldCount++;
-          for (let i = 0; i < certificationsArray.length; i++) {
-            if (cvCertificationsArray.indexOf(certificationsArray[i]) > -1) {
-              certificationMatchCount++;
-            }
-          }
-          certificationScore = Math.ceil( (certificationMatchCount * 100) / certificatoinReqCount);
-        }
-        matchFieldCount++;
-        if (cvObj.education == jobPosts.education) {
-          educationMatchCount = 100;
-        } else {
-          educationMatchCount = 50;
-        }
-
-
-        applicantScore =Math.ceil((skillScore + certificationScore + educationMatchCount) / matchFieldCount);
-
-        var matcherObject = {
-          "jobId": jobId,
-          "applicationId": cvObj._id,
-          "skillScore": skillScore,
-          "certificationScore": certificationScore,
-          "educationScore": educationMatchCount,
-          "matchFieldCount": matchFieldCount,
-          "score": applicantScore
-        };
-
-        //console.log(matcherObject);
-        //console.log(skillArray);
-        //console.log(cvSkillArray);
-        //console.log(matchFieldCount, skillMatchCount, certificationMatchCount, skillScore, certificationScore, applicantScore);
-        matcherObject = await Profile_MatcherModel.updateOne({ "jobId": jobId, "applicationId": cvObj._id }, { $set: matcherObject }, { upsert: true, new: true });
+        compareJOBAndCV(jobId, cvObj._id)
       }
+
       var updateFields = {};
       if(matchType == 'PAST') {
         updateFields.pastSearchCompleted = true;
@@ -1052,7 +984,6 @@ const cronCvMatch = async (jobPostList, matchType) => {
           } 
         }
       }
-      //console.log("jobUpdateFields : ", updateFields);
       await JOBPOSTSMODEL.updateOne({ _id: jobId }, { $set: updateFields});
     }
 
