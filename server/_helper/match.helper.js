@@ -855,83 +855,93 @@ const compareJOBAndCV = async (jobId, applicationId) => {
 const cronCVMatch = async (jobPostList, matchType) => {
   try {
     for (jobPosts of jobPostList) {
-      var currentDate = new Date();
-      let whereQuery = {};
-      var jobId = jobPosts._id;
 
-      jobPosts.skillCode = jobPosts.skillCode ? jobPosts.skillCode : '';
-      let skillRegex = jobPosts.skillCode.replace(/::/g, ":|:");
-      let skillArray = skillRegex.replace(/:/g, "").split('|');
-      if (skillArray.length == 1 && skillArray[0] == '') {
-        skillRegex = '';
-        skillArray = [];
+      const CVList = await cronCVList(jobPosts, matchType)
+      for (const cvObj of CVList) {
+        compareJOBAndCV(jobPosts._id, cvObj._id)
       }
 
-      jobPosts.certificationCode = jobPosts.certificationCode ? jobPosts.certificationCode : '';
-      let certificationsRegex = jobPosts.certificationCode.replace(/::/g, ":|:");
-      let certificationsArray = certificationsRegex.replace(/:/g, "").split('|');
-      if (certificationsArray.length == 1 && certificationsArray[0] == '') {
-        certificationsRegex = '';
-        certificationsArray = [];
-      }
+    }
+  } catch (err) {
+    console.error(err);
+  }
+}
 
-      let skillReqCount = skillArray.length;
-      let certificatoinReqCount = certificationsArray.length;
+const cronCVList = async (jobPosts, matchType) => {
+  try {
+    var currentDate = new Date();
+    let whereQuery = {};
+    var jobId = jobPosts._id;
 
-      let orCriteria = [];
-      if (skillReqCount > 0) {
-        orCriteria.push({ skillCode: { $regex: skillRegex } });
-      }
-      if (certificatoinReqCount > 0) {
-        orCriteria.push({ certificationCode: { $regex: certificationsRegex } });
-      }
-      if (orCriteria.length > 0) {
-        whereQuery = {
-          $or: orCriteria
-        };
-      }
-
-      let cvList = [];
-
-      if(matchType == 'PAST') {
-        const endDate = moment.utc().subtract(30, "days").toISOString();
-        whereQuery.customUpdatedAt = { $gte : endDate };
-        if (jobPosts.matchEndDate) {
-          whereQuery.customUpdatedAt.$lte = jobPosts.matchEndDate;
-        }
-        cvList = await JOBCVMODEL.find(whereQuery).sort({ 'customUpdatedAt': -1 }).limit(1000); // old limit is 200 
-      } else {
-        if (jobPosts.matchStartDate) {
-          whereQuery.customUpdatedAt = { $gte: jobPosts.matchStartDate };
-        }
-        cvList = await JOBCVMODEL.find(whereQuery).sort({ 'customUpdatedAt': 1 }).limit(100);
-      }
-
-      for (const cvObj of cvList) {
-        compareJOBAndCV(jobId, cvObj._id)
-      }
-
-      var updateFields = {};
-      if(matchType == 'PAST') {
-        updateFields.pastSearchCompleted = true;
-        if(cvList.length > 0) {
-          var oldestCVCustomUpdatedAt = cvList[cvList.length - 1].customUpdatedAt;
-          if(oldestCVCustomUpdatedAt){
-            updateFields.matchEndDate = oldestCVCustomUpdatedAt;
-          }            
-        }
-      } else {
-        updateFields.matchStartDate = currentDate;
-        if(cvList.length > 0){
-          var newCVCustomUpdatedAt = cvList[cvList.length - 1].customUpdatedAt;
-          if(newCVCustomUpdatedAt){
-            updateFields.matchStartDate = newCVCustomUpdatedAt;
-          } 
-        }
-      }
-      await JOBPOSTSMODEL.updateOne({ _id: jobId }, { $set: updateFields});
+    jobPosts.skillCode = jobPosts.skillCode ? jobPosts.skillCode : '';
+    let skillRegex = jobPosts.skillCode.replace(/::/g, ":|:");
+    let skillArray = skillRegex.replace(/:/g, "").split('|');
+    if (skillArray.length == 1 && skillArray[0] == '') {
+      skillRegex = '';
+      skillArray = [];
     }
 
+    jobPosts.certificationCode = jobPosts.certificationCode ? jobPosts.certificationCode : '';
+    let certificationsRegex = jobPosts.certificationCode.replace(/::/g, ":|:");
+    let certificationsArray = certificationsRegex.replace(/:/g, "").split('|');
+    if (certificationsArray.length == 1 && certificationsArray[0] == '') {
+      certificationsRegex = '';
+      certificationsArray = [];
+    }
+
+    let skillReqCount = skillArray.length;
+    let certificatoinReqCount = certificationsArray.length;
+
+    let orCriteria = [];
+    if (skillReqCount > 0) {
+      orCriteria.push({ skillCode: { $regex: skillRegex } });
+    }
+    if (certificatoinReqCount > 0) {
+      orCriteria.push({ certificationCode: { $regex: certificationsRegex } });
+    }
+    if (orCriteria.length > 0) {
+      whereQuery = {
+        $or: orCriteria
+      };
+    }
+
+    let cvList = [];
+
+    if(matchType == 'PAST') {
+      const endDate = moment.utc().subtract(30, "days").toISOString();
+      whereQuery.customUpdatedAt = { $gte : endDate };
+      if (jobPosts.matchEndDate) {
+        whereQuery.customUpdatedAt.$lte = jobPosts.matchEndDate;
+      }
+      cvList = await JOBCVMODEL.find(whereQuery).sort({ 'customUpdatedAt': -1 }).limit(1000); // old limit is 200 
+    } else {
+      if (jobPosts.matchStartDate) {
+        whereQuery.customUpdatedAt = { $gte: jobPosts.matchStartDate };
+      }
+      cvList = await JOBCVMODEL.find(whereQuery).sort({ 'customUpdatedAt': 1 }).limit(100);
+    }
+
+    var updateFields = {};
+    if(matchType == 'PAST') {
+      updateFields.pastSearchCompleted = true;
+      if(cvList.length > 0) {
+        var oldestCVCustomUpdatedAt = cvList[cvList.length - 1].customUpdatedAt;
+        if(oldestCVCustomUpdatedAt){
+          updateFields.matchEndDate = oldestCVCustomUpdatedAt;
+        }            
+      }
+    } else {
+      updateFields.matchStartDate = currentDate;
+      if(cvList.length > 0){
+        var newCVCustomUpdatedAt = cvList[cvList.length - 1].customUpdatedAt;
+        if(newCVCustomUpdatedAt){
+          updateFields.matchStartDate = newCVCustomUpdatedAt;
+        } 
+      }
+    }
+    await JOBPOSTSMODEL.updateOne({ _id: jobId }, { $set: updateFields});
+
+    return cvList
   } catch (err) {
     console.error(err);
   }
