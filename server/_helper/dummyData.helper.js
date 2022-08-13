@@ -9,8 +9,8 @@ module.exports = {
         try {
             var n = payload.n;
 
-            var firstNameList = ['Bhavesh', 'Nitin', 'Manish', 'Rahul', 'Raj', 'Vijay'];
-            var lastNameList = ['Vavadiya', 'Shinde', 'Sharma', 'Malhotra', 'Pawar', 'Iyer'];
+            var firstNameList =  ['Naseer', 'Khalid', 'Ahmed', 'Yousef', 'Sultan']
+            var lastNameList =  ['Alkhaldi', 'Alqahtani', 'Khalid', 'Ahmed', 'Yousef', 'Sultan', 'Alnahdi', 'Alotaibi']
             var positionList = ["Research Assistant", "Data Analyst", "Business Analyst", "Network administrator", "User experience designer", "Systems analyst", "Database administrator",
                 "Software application packager", "Full-stack developer", "Senior software engineer", "Data scientist", "Development operations engineer", "Cloud engineer", "IT security specialist",
                 "Analytics manager", "Mobile developer", "Game developer", "Hardware engineer", "Web developer", "IT coordinator", "Web administrator"];
@@ -210,8 +210,8 @@ module.exports = {
         try {
             var n = payload.n;
 
-            var firstNameList = ['Bhavesh', 'Nitin', 'Manish', 'Rahul', 'Raj', 'Vijay'];
-            var lastNameList = ['Vavadiya', 'Shinde', 'Sharma', 'Malhotra', 'Pawar', 'Iyer'];
+            var firstNameList =  ['Naseer', 'Khalid', 'Ahmed', 'Yousef', 'Sultan']
+            var lastNameList =  ['Alkhaldi', 'Alqahtani', 'Khalid', 'Ahmed', 'Yousef', 'Sultan', 'Alnahdi', 'Alotaibi']
             var skillList = [
                 ["Communication", "Designs", "Applications", "Program Management", "Analysis"],
                 ["Project Management", "Computer Program", "Research", "Websites", "Testing"],
@@ -329,6 +329,7 @@ module.exports = {
                 "procurement_and_supply_chain", "real_estate", "renewable_energy", "sales", "tax", "treasury",];
 
             for (const iterator of new Array(n)) {
+                console.log("1-");
 
 
                 var firstNameIndex = 0;

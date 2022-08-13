@@ -2,6 +2,7 @@ const JOBPOSTSMODEL = require("../models/JobPosts");
 const JOBCVMODEL = require("../models/jobCV");
 const Profile_MatcherModel = require("../models/profileMatcher");
 const moment = require("moment");
+const request = require('request');
 
 module.exports = {
 
@@ -746,7 +747,12 @@ const CVMatch = async (jobId) => {
     const cvList = await RequestModelData(JOBCVMODEL, JOBPOSTSMODEL, jobId)
     
     for (const cvObj of cvList) {
-      compareJOBAndCV(jobId, cvObj._id)
+      request(`https://6or5jy7zkvwtcrhm3scgaibn6e0uiseu.lambda-url.ap-south-1.on.aws/?jobId=${jobId}&applicationId=${cvObj._id}`, function (error, response, body) {
+        if(error){
+          throw new Error('lambda function called failing');
+        }
+        console.log(body);
+      });
     }
   } catch (err) {
     console.error(err);
@@ -759,7 +765,12 @@ const JOBMatch = async (applicationId) => {
     const jobList = await RequestModelData(JOBPOSTSMODEL, JOBCVMODEL, applicationId)
     
     for (const jobObj of jobList) {
-      compareJOBAndCV(jobObj._id, applicationId)
+      request(`https://6or5jy7zkvwtcrhm3scgaibn6e0uiseu.lambda-url.ap-south-1.on.aws/?jobId=${jobObj._id}&applicationId=${applicationId}`, function (error, response, body) {
+        if(error){
+          throw new Error('lambda function called failing');
+        }
+        console.log(body);
+      });
     }
   } catch (err) {
     console.error(err);
@@ -858,7 +869,12 @@ const cronCVMatch = async (jobPostList, matchType) => {
 
       const CVList = await cronCVList(jobPosts, matchType)
       for (const cvObj of CVList) {
-        compareJOBAndCV(jobPosts._id, cvObj._id)
+        request(`https://6or5jy7zkvwtcrhm3scgaibn6e0uiseu.lambda-url.ap-south-1.on.aws/?jobId=${jobPosts._id}&applicationId=${cvObj._id}`, function (error, response, body) {
+        if(error){
+          throw new Error('lambda function called failing');
+        }
+        console.log(body);
+      });
       }
 
     }

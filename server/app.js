@@ -43,7 +43,7 @@ if (!isProduction) {
 if (isProduction) {
   mongoose.connect(process.env.MONGODB_URI);
 } else {
-  mongoose.connect("mongodb://127.0.0.1:27017/hire_it");
+  mongoose.connect("mongodb+srv://status:status@cluster0.jnsv4.mongodb.net/hire_it");
   mongoose.set("debug", false);
 }
 
