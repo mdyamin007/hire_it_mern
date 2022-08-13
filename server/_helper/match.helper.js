@@ -674,14 +674,14 @@ module.exports = {
   }
 };
 
-const CVMatch = async (jobId) => {
+const RequestModelData = async (ModelOne, ModelTwo, id) => {
 
   try {
     var searchStartDate = null;
     var searchEndDate = null;
     var whereQuery = {};
-    var firstRecord = await JOBCVMODEL.find().sort({ 'customUpdatedAt': -1 }).limit(1);
-    var lastRecord = await JOBCVMODEL.find().sort({ 'customUpdatedAt': -1 }).limit(1).skip(100);
+    var firstRecord = await ModelOne.find().sort({ 'customUpdatedAt': -1 }).limit(1);
+    var lastRecord = await ModelOne.find().sort({ 'customUpdatedAt': -1 }).limit(1).skip(100);
 
     if (firstRecord.length > 0) {
       searchStartDate = firstRecord[0].updatedAt;
@@ -690,18 +690,18 @@ const CVMatch = async (jobId) => {
       searchEndDate = lastRecord[0].updatedAt;
     }
 
-    var jobPosts = await JOBPOSTSMODEL.findById({ _id: jobId });
+    var postsData = await ModelTwo.findById({ _id: id });
 
-    jobPosts.skillCode = jobPosts.skillCode ? jobPosts.skillCode : '';
-    var skillRegex = jobPosts.skillCode.replace(/::/g, ":|:");
+    postsData.skillCode = postsData.skillCode ? postsData.skillCode : '';
+    var skillRegex = postsData.skillCode.replace(/::/g, ":|:");
     var skillArray = skillRegex.replace(/:/g, "").split('|');
     if (skillArray.length == 1 && skillArray[0] == '') {
       skillRegex = '';
       skillArray = [];
     }
 
-    jobPosts.certificationCode = jobPosts.certificationCode ? jobPosts.certificationCode : '';
-    var certificationsRegex = jobPosts.certificationCode.replace(/::/g, ":|:");
+    postsData.certificationCode = postsData.certificationCode ? postsData.certificationCode : '';
+    var certificationsRegex = postsData.certificationCode.replace(/::/g, ":|:");
     var certificationsArray = certificationsRegex.replace(/:/g, "").split('|');
     if (certificationsArray.length == 1 && certificationsArray[0] == '') {
       certificationsRegex = '';
@@ -724,8 +724,6 @@ const CVMatch = async (jobId) => {
       };
     }
 
-    var cvList = [];
-
     if (searchStartDate && searchEndDate) {
       whereQuery.updatedAt = { $lte: searchStartDate, $gte: searchEndDate };
     } else if (searchStartDate) {
@@ -733,17 +731,24 @@ const CVMatch = async (jobId) => {
     } else if (searchEndDate) {
       whereQuery.updatedAt = { $gte: searchEndDate };
     }
-    cvList = await JOBCVMODEL.find(whereQuery).sort({ 'customUpdatedAt': -1 });
+    var payload = { $set: { matchStartDate: searchStartDate, matchEndDate: searchEndDate } };
+    await ModelTwo.updateOne({ _id: id }, payload);
+    
+    return await ModelOne.find(whereQuery).sort({ 'customUpdatedAt': -1 });
+  } catch (err) {
+    console.error(err);
+    return { err: err };
+  }
+}
 
+const CVMatch = async (jobId) => {
+  try {
+    const cvList = await RequestModelData(JOBCVMODEL, JOBPOSTSMODEL, jobId)
+    
     for (const cvObj of cvList) {
       compareJOBAndCV(jobId, cvObj._id)
     }
-
-    var jpbUpdateFields = { $set: { matchStartDate: searchStartDate, matchEndDate: searchEndDate } };
-    await JOBPOSTSMODEL.updateOne({ _id: jobId }, jpbUpdateFields);
-
   } catch (err) {
-    console.log("CATCH ::fn[fetchAggregateDatatableRecords]:::>");
     console.error(err);
     return { err: err };
   }
@@ -751,72 +756,12 @@ const CVMatch = async (jobId) => {
 
 const JOBMatch = async (applicationId) => {
   try {
-    var searchStartDate = null;
-    var searchEndDate = null;
-    var whereQuery = {};
-    var firstRecord = await JOBPOSTSMODEL.find().sort({ 'customUpdatedAt': -1 }).limit(1);
-    var lastRecord = await JOBPOSTSMODEL.find().sort({ 'customUpdatedAt': -1 }).limit(1).skip(100);
-    if (firstRecord.length > 0) {
-      searchStartDate = firstRecord[0].updatedAt;
-    }
-    if (lastRecord.length > 0) {
-      searchEndDate = lastRecord[0].updatedAt;
-    }
-
-    var applicationCV = await JOBCVMODEL.findById({ _id: applicationId });
-
-    applicationCV.skillCode = applicationCV.skillCode ? applicationCV.skillCode : '';
-    var skillRegex = applicationCV.skillCode.replace(/::/g, ":|:");
-    var skillArray = skillRegex.replace(/:/g, "").split('|');
-    if (skillArray.length == 1 && skillArray[0] == '') {
-      skillRegex = '';
-      skillArray = [];
-    }
-
-    applicationCV.certificationCode = applicationCV.certificationCode ? applicationCV.certificationCode : '';
-    var certificationsRegex = applicationCV.certificationCode.replace(/::/g, ":|:");
-    var certificationsArray = certificationsRegex.replace(/:/g, "").split('|');
-    if (certificationsArray.length == 1 && certificationsArray[0] == '') {
-      certificationsRegex = '';
-      certificationsArray = [];
-    }
-
-    var skillReqCount = skillArray.length;
-    var certificatoinReqCount = certificationsArray.length;
-
-    var orCriteria = [];
-    if (skillReqCount > 0) {
-      orCriteria.push({ skillCode: { $regex: skillRegex } });
-    }
-    if (certificatoinReqCount > 0) {
-      orCriteria.push({ certificationCode: { $regex: certificationsRegex } });
-    }
-    if (orCriteria.length > 0) {
-      whereQuery = {
-        $or: orCriteria
-      };
-    }
-
-    var jobList = [];
-
-    if (searchStartDate && searchEndDate) {
-      whereQuery.updatedAt = { $lte: searchStartDate, $gte: searchEndDate };
-    } else if (searchStartDate) {
-      whereQuery.updatedAt = { $lte: searchStartDate };
-    } else if (searchEndDate) {
-      whereQuery.updatedAt = { $gte: searchEndDate };
-    }
-    jobList = await JOBPOSTSMODEL.find(whereQuery).sort({ 'customUpdatedAt': -1 });
-
+    const jobList = await RequestModelData(JOBPOSTSMODEL, JOBCVMODEL, applicationId)
+    
     for (const jobObj of jobList) {
       compareJOBAndCV(jobObj._id, applicationId)
     }
-
-    var jpbUpdateFields = { $set: { matchStartDate: searchStartDate, matchEndDate: searchEndDate } };
-    await JOBCVMODEL.updateOne({ _id: applicationId }, jpbUpdateFields);
-
   } catch (err) {
-    console.log("CATCH ::fn[fetchAggregateDatatableRecords]:::>");
     console.error(err);
     return { err: err };
   }
@@ -988,9 +933,6 @@ const cronCVMatch = async (jobPostList, matchType) => {
     }
 
   } catch (err) {
-    console.log("CATCH ::fn[Cron Cv_Match_Wtih_Job Error occur]:::>");
     console.error(err);
   }
 }
-
-
