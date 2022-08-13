@@ -690,18 +690,18 @@ const RequestModelData = async (ModelOne, ModelTwo, id) => {
       searchEndDate = lastRecord[0].updatedAt;
     }
 
-    var postsData = await ModelTwo.findById({ _id: id });
+    var ApplicationList = await ModelTwo.findById({ _id: id });
 
-    postsData.skillCode = postsData.skillCode ? postsData.skillCode : '';
-    var skillRegex = postsData.skillCode.replace(/::/g, ":|:");
+    ApplicationList.skillCode = ApplicationList.skillCode ? ApplicationList.skillCode : '';
+    var skillRegex = ApplicationList.skillCode.replace(/::/g, ":|:");
     var skillArray = skillRegex.replace(/:/g, "").split('|');
     if (skillArray.length == 1 && skillArray[0] == '') {
       skillRegex = '';
       skillArray = [];
     }
 
-    postsData.certificationCode = postsData.certificationCode ? postsData.certificationCode : '';
-    var certificationsRegex = postsData.certificationCode.replace(/::/g, ":|:");
+    ApplicationList.certificationCode = ApplicationList.certificationCode ? ApplicationList.certificationCode : '';
+    var certificationsRegex = ApplicationList.certificationCode.replace(/::/g, ":|:");
     var certificationsArray = certificationsRegex.replace(/:/g, "").split('|');
     if (certificationsArray.length == 1 && certificationsArray[0] == '') {
       certificationsRegex = '';
