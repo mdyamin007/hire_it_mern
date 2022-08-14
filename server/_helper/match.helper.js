@@ -71,7 +71,7 @@ module.exports = {
       cvList = await JOBCVMODEL.find(whereQuery).sort({ 'customUpdatedAt': -1 });
 
       for (const cvObj of cvList) {
-
+      
         let matchFieldCount = 0;
         let skillMatchCount = 0;
         let educationMatchCount = 0;
