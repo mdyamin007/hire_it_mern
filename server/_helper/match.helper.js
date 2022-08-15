@@ -3,6 +3,7 @@ const JOBCVMODEL = require("../models/jobCV");
 const Profile_MatcherModel = require("../models/profileMatcher");
 const moment = require("moment");
 const request = require('request');
+const axios = require("axios")
 
 module.exports = {
 
@@ -672,214 +673,37 @@ module.exports = {
       console.error(err);
 
     }
+  },
+
+  cronList: async (jobPostList) => {
+    try {
+      var promises = []
+      for (const jobPosts of jobPostList) {
+        var CVList = await cronCVList(jobPosts)
+        let array = []
+        for(const jobObj of CVList){
+          array.push({ cvId: jobObj._id, jobId: jobPosts._id })
+        }
+        promises.push(Lambda(array))
+      }
+
+      await Promise.all(promises)
+    } catch (err) {
+      console.error(err);
+    }
   }
 };
 
-const RequestModelData = async (ModelOne, ModelTwo, id) => {
-
-  try {
-    var searchStartDate = null;
-    var searchEndDate = null;
-    var whereQuery = {};
-    var firstRecord = await ModelOne.find().sort({ 'customUpdatedAt': -1 }).limit(1);
-    var lastRecord = await ModelOne.find().sort({ 'customUpdatedAt': -1 }).limit(1).skip(100);
-
-    if (firstRecord.length > 0) {
-      searchStartDate = firstRecord[0].updatedAt;
-    }
-    if (lastRecord.length > 0) {
-      searchEndDate = lastRecord[0].updatedAt;
-    }
-
-    var ApplicationList = await ModelTwo.findById({ _id: id });
-
-    ApplicationList.skillCode = ApplicationList.skillCode ? ApplicationList.skillCode : '';
-    var skillRegex = ApplicationList.skillCode.replace(/::/g, ":|:");
-    var skillArray = skillRegex.replace(/:/g, "").split('|');
-    if (skillArray.length == 1 && skillArray[0] == '') {
-      skillRegex = '';
-      skillArray = [];
-    }
-
-    ApplicationList.certificationCode = ApplicationList.certificationCode ? ApplicationList.certificationCode : '';
-    var certificationsRegex = ApplicationList.certificationCode.replace(/::/g, ":|:");
-    var certificationsArray = certificationsRegex.replace(/:/g, "").split('|');
-    if (certificationsArray.length == 1 && certificationsArray[0] == '') {
-      certificationsRegex = '';
-      certificationsArray = [];
-    }
-
-    var skillReqCount = skillArray.length;
-    var certificatoinReqCount = certificationsArray.length;
-
-    var orCriteria = [];
-    if (skillReqCount > 0) {
-      orCriteria.push({ skillCode: { $regex: skillRegex } });
-    }
-    if (certificatoinReqCount > 0) {
-      orCriteria.push({ certificationCode: { $regex: certificationsRegex } });
-    }
-    if (orCriteria.length > 0) {
-      whereQuery = {
-        $or: orCriteria
-      };
-    }
-
-    if (searchStartDate && searchEndDate) {
-      whereQuery.updatedAt = { $lte: searchStartDate, $gte: searchEndDate };
-    } else if (searchStartDate) {
-      whereQuery.updatedAt = { $lte: searchStartDate };
-    } else if (searchEndDate) {
-      whereQuery.updatedAt = { $gte: searchEndDate };
-    }
-    var payload = { $set: { matchStartDate: searchStartDate, matchEndDate: searchEndDate } };
-    await ModelTwo.updateOne({ _id: id }, payload);
-    
-    return await ModelOne.find(whereQuery).sort({ 'customUpdatedAt': -1 });
-  } catch (err) {
-    console.error(err);
-    return { err: err };
-  }
-}
-
-const CVMatch = async (jobId) => {
-  try {
-    const cvList = await RequestModelData(JOBCVMODEL, JOBPOSTSMODEL, jobId)
-    
-    for (const cvObj of cvList) {
-      request(`https://6or5jy7zkvwtcrhm3scgaibn6e0uiseu.lambda-url.ap-south-1.on.aws/?jobId=${jobId}&applicationId=${cvObj._id}`, function (error, response, body) {
-        if(error){
-          throw new Error('lambda function called failing');
-        }
-        console.log(body);
-      });
-    }
-  } catch (err) {
-    console.error(err);
-    return { err: err };
-  }
-}
-
-const JOBMatch = async (applicationId) => {
-  try {
-    const jobList = await RequestModelData(JOBPOSTSMODEL, JOBCVMODEL, applicationId)
-    
-    for (const jobObj of jobList) {
-      request(`https://6or5jy7zkvwtcrhm3scgaibn6e0uiseu.lambda-url.ap-south-1.on.aws/?jobId=${jobObj._id}&applicationId=${applicationId}`, function (error, response, body) {
-        if(error){
-          throw new Error('lambda function called failing');
-        }
-        console.log(body);
-      });
-    }
-  } catch (err) {
-    console.error(err);
-    return { err: err };
-  }
-}
-
-const compareJOBAndCV = async (jobId, applicationId) => {
-  var jobObj = await JOBPOSTSMODEL.findById(jobId)
-  var applicationCV = await JOBCVMODEL.findById(applicationId);
-
-  applicationCV.skillCode = applicationCV.skillCode ? applicationCV.skillCode : '';
-  var skillRegex = applicationCV.skillCode.replace(/::/g, ":|:");
-  var skillArray = skillRegex.replace(/:/g, "").split('|');
-  if (skillArray.length == 1 && skillArray[0] == '') {
-    skillRegex = '';
-    skillArray = [];
-  }
-
-  applicationCV.certificationCode = applicationCV.certificationCode ? applicationCV.certificationCode : '';
-  var certificationsRegex = applicationCV.certificationCode.replace(/::/g, ":|:");
-  var certificationsArray = certificationsRegex.replace(/:/g, "").split('|');
-  if (certificationsArray.length == 1 && certificationsArray[0] == '') {
-    certificationsRegex = '';
-    certificationsArray = [];
-  }
-
-  let matchFieldCount = 0;
-  let skillMatchCount = 0;
-  let educationMatchCount = 0;
-  let certificationMatchCount = 0;
-  let skillScore = 0;
-  let certificationScore = 0;
-  let applicantScore = 0;
-
-  jobObj.skillCode = jobObj.skillCode ? jobObj.skillCode : '';
-  let jobSkillArray = jobObj.skillCode.replace(/::/g, "|").replace(/:/g, "").split('|');
-
-  jobObj.certificationCode = jobObj.certificationCode ? jobObj.certificationCode : '';
-  let jobCertificationsArray = jobObj.certificationCode.replace(/::/g, "|").replace(/:/g, "").split('|');
-
-  if (jobSkillArray.length == 1 && jobSkillArray[0] == '') {
-    jobSkillArray = [];
-  }
-  if (jobCertificationsArray.length == 1 && jobCertificationsArray[0] == '') {
-    jobCertificationsArray = [];
-  }
-
-  let jobSkillReqCount = skillArray.length;
-  let jobCertificatoinReqCount = certificationsArray.length;
-
-  if (jobSkillReqCount > 0) {
-    matchFieldCount++;
-    for (let i = 0; i < jobSkillArray.length; i++) {
-      if (skillArray.indexOf(jobSkillArray[i]) > -1) {
-        skillMatchCount++;
-      }
-    }
-    skillScore =  Math.ceil((skillMatchCount * 100) / jobSkillReqCount);
-  }
-
-  if (jobCertificatoinReqCount > 0) {
-    matchFieldCount++;
-    for (let i = 0; i < jobCertificationsArray.length; i++) {
-      if (certificationsArray.indexOf(jobCertificationsArray[i]) > -1) {
-        certificationMatchCount++;
-      }
-    }
-    certificationScore =  Math.ceil((certificationMatchCount * 100) / jobCertificatoinReqCount);
-  }
-
-  matchFieldCount++;
-  if (jobObj.education == applicationCV.education) {
-    educationMatchCount = 100;
-  } else {
-    educationMatchCount = 50;
-  }
-  applicantScore = Math.ceil((skillScore + certificationScore + educationMatchCount) / matchFieldCount);
-
-  var matcherObject = {
-    "jobId": jobObj._id,
-    "applicationId": applicationId,
-    "skillScore": skillScore,
-    "certificationScore": certificationScore,
-    "educationScore": educationMatchCount,
-    "matchFieldCount": matchFieldCount,
-    "score": applicantScore
-  };
-
-  await Profile_MatcherModel.updateOne({ "jobId": jobObj._id, "applicationId": applicationId }, { $set: matcherObject }, { upsert: true, new: true });
-}
-
-const cronCVMatch = async (jobPostList, matchType) => {
-  try {
-    for (jobPosts of jobPostList) {
-
-      const CVList = await cronCVList(jobPosts, matchType)
-      for (const cvObj of CVList) {
-        request(`https://6or5jy7zkvwtcrhm3scgaibn6e0uiseu.lambda-url.ap-south-1.on.aws/?jobId=${jobPosts._id}&applicationId=${cvObj._id}`, function (error, response, body) {
-        if(error){
-          throw new Error('lambda function called failing');
-        }
-        console.log(body);
-      });
-      }
-
-    }
-  } catch (err) {
-    console.error(err);
+const Lambda = (data) => {
+  try { 
+    var url = `https://6or5jy7zkvwtcrhm3scgaibn6e0uiseu.lambda-url.ap-south-1.on.aws/`
+    axios({
+      method: 'post',
+      url: url,
+      data: data
+    }).then().catch(er => console.log(er))
+  } catch (e) {
+    console.log(e);
   }
 }
 
@@ -922,43 +746,30 @@ const cronCVList = async (jobPosts, matchType) => {
     }
 
     let cvList = [];
-
-    if(matchType == 'PAST') {
       const endDate = moment.utc().subtract(30, "days").toISOString();
       whereQuery.customUpdatedAt = { $gte : endDate };
       if (jobPosts.matchEndDate) {
         whereQuery.customUpdatedAt.$lte = jobPosts.matchEndDate;
       }
-      cvList = await JOBCVMODEL.find(whereQuery).sort({ 'customUpdatedAt': -1 }).limit(1000); // old limit is 200 
-    } else {
-      if (jobPosts.matchStartDate) {
-        whereQuery.customUpdatedAt = { $gte: jobPosts.matchStartDate };
-      }
-      cvList = await JOBCVMODEL.find(whereQuery).sort({ 'customUpdatedAt': 1 }).limit(100);
-    }
+      cvList = await JOBCVMODEL.find(whereQuery).sort({ 'customUpdatedAt': -1 }).limit(1000);
+      console.log(cvList.length);
 
     var updateFields = {};
-    if(matchType == 'PAST') {
-      updateFields.pastSearchCompleted = true;
       if(cvList.length > 0) {
         var oldestCVCustomUpdatedAt = cvList[cvList.length - 1].customUpdatedAt;
         if(oldestCVCustomUpdatedAt){
           updateFields.matchEndDate = oldestCVCustomUpdatedAt;
         }            
       }
-    } else {
-      updateFields.matchStartDate = currentDate;
-      if(cvList.length > 0){
-        var newCVCustomUpdatedAt = cvList[cvList.length - 1].customUpdatedAt;
-        if(newCVCustomUpdatedAt){
-          updateFields.matchStartDate = newCVCustomUpdatedAt;
-        } 
-      }
-    }
-    await JOBPOSTSMODEL.updateOne({ _id: jobId }, { $set: updateFields});
+    JOBPOSTSMODEL.updateOne({ _id: jobId }, { $set: updateFields}).then()
 
     return cvList
   } catch (err) {
     console.error(err);
   }
 }
+
+// module.exports = {
+//   cronCVList,
+//   Lambda
+// }
