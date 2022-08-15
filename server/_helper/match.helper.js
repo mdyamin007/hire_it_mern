@@ -746,12 +746,13 @@ const cronCVList = async (jobPosts, matchType) => {
     }
 
     let cvList = [];
-      const endDate = moment.utc().subtract(30, "days").toISOString();
-      whereQuery.customUpdatedAt = { $gte : endDate };
       if (jobPosts.matchEndDate) {
         whereQuery.customUpdatedAt.$lte = jobPosts.matchEndDate;
       }
-      cvList = await JOBCVMODEL.find(whereQuery).sort({ 'customUpdatedAt': -1 }).limit(1000);
+      if (jobPosts.matchStartDate) {
+        whereQuery.customUpdatedAt.$gte = jobPosts.matchStartDate;
+      }
+      cvList = await JOBCVMODEL.find(whereQuery).sort({ 'customUpdatedAt': -1 });
 
     var updateFields = {};
       if(cvList.length > 0) {
