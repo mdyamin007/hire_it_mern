@@ -66,9 +66,9 @@ const Past_Cv_Match_Wtih_Job =  async () => {
     console.log("TASK-1 fn[Past_Cv_Match_WtihJob] - END ::::>");
 }
 
-const cron_job = new CronJob("12 * * * *", async () => {
+const cron_job = new CronJob("*/5 * * * *", async () => {
     try {
-        const jobs = await JOBPOSTSMODEL.find().skip(1000).limit(1000)
+        const jobs = await JOBPOSTSMODEL.find()
         console.log("cron start", new Date());
         let promise = []
         for (let i = 1; i <= jobs.length / 10; i++) {

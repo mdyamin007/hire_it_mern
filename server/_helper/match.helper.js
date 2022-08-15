@@ -677,7 +677,6 @@ module.exports = {
 
   cronList: async (jobPostList) => {
     try {
-      console.log(jobPostList.length);
       var promises = []
       for (const jobPosts of jobPostList) {
         var CVList = await cronCVList(jobPosts)
