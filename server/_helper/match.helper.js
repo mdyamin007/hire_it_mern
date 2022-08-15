@@ -752,7 +752,6 @@ const cronCVList = async (jobPosts, matchType) => {
         whereQuery.customUpdatedAt.$lte = jobPosts.matchEndDate;
       }
       cvList = await JOBCVMODEL.find(whereQuery).sort({ 'customUpdatedAt': -1 }).limit(1000);
-      console.log(cvList.length);
 
     var updateFields = {};
       if(cvList.length > 0) {

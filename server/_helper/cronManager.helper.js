@@ -47,12 +47,12 @@ agenda.define("Test_Cron_Run", async (job, done) => {
 
     done();
 });
-agenda.on("ready", () => {
-    agenda.every("3 minutes", "Past_Cv_Match_WtihJob");
-    agenda.every("5 minutes", "Future_Cv_Match_WtihJob");
-    // agenda.every("2 minutes", "Test_Cron_Run");
-    agenda.start();
-});
+// agenda.on("ready", () => {
+//     agenda.every("3 minutes", "Past_Cv_Match_WtihJob");
+//     agenda.every("5 minutes", "Future_Cv_Match_WtihJob");
+//     // agenda.every("2 minutes", "Test_Cron_Run");
+//     agenda.start();
+// });
 
 const Past_Cv_Match_Wtih_Job =  async () => {
     const startDate = moment.utc().subtract(PROCESS_PAST_DAYS_JOBS, "days").toISOString();
@@ -60,18 +60,18 @@ const Past_Cv_Match_Wtih_Job =  async () => {
     var jobPostList = await JOBPOSTSMODEL.find({ customUpdatedAt: { "$gte": new Date(startDate) }, pastSearchCompleted: false }).limit(PROCESS_PER_PAST_JOB);
     console.log("TASK-1 fn[Past_Cv_Match_WtihJob] - START ::::>");
     if (jobPostList) {
-        await MATCHHELPER.cronCVMatch22(jobPostList, MATCH_TYPE_PAST);
+        await MATCHHELPER.cronCVMatch(jobPostList, MATCH_TYPE_PAST);
     }
     console.log("Past_Cv_Match_WtihJob End", new Date());
     console.log("TASK-1 fn[Past_Cv_Match_WtihJob] - END ::::>");
 }
 
-const cron_job = new CronJob("1/5 * * * *", async () => {
+const cron_job = new CronJob("*/5 * * * *", async () => {
   try {
-    const jobs = await JOBPOSTSMODEL.find().limit(100);
+    const jobs = await JOBPOSTSMODEL.find()
     console.log("cron start", new Date());
     let promise = []
-    for (let i = 1; i <= jobs.length; i++) {
+    for (let i = 1; i <= jobs.length / 10; i++) {
         let cpage = i
         let perpage = 10
         let start = cpage * perpage - perpage;
@@ -100,7 +100,7 @@ const Future_Cv_Match_Wtih_Job = async () => {
   }).limit(PROCESS_PER_JOB);
   console.log("TASK-1 fn[Future_Cv_Match_WtihJob] - START ::::>");
   if (jobPostList) {
-    await MATCHHELPER.cronCVMatch22(jobPostList, MATCH_TYPE_FUTURE);
+    await MATCHHELPER.cronCVMatch(jobPostList, MATCH_TYPE_FUTURE);
   }
   console.log("Future_Cv_Match_WtihJob End", new Date());
   console.log("TASK-1 fn[Future_Cv_Match_WtihJob] - END ::::>");
