@@ -677,19 +677,43 @@ module.exports = {
 
   cronList: async (jobPostList) => {
     try {
-      var promises = []
-      for (const jobPosts of jobPostList) {
-        var CVList = await cronCVList(jobPosts)
-        for(let k = 0; k < parseInt(CVList.length/1000); k++){
-          let array = []
-          for(let i = k * 1000;  i < k * 1000 + 1000; i++){
-            array.push({ cvId: CVList[i]?._id, jobId: jobPosts?._id })
-            if(CVList.length === i+1) break;
-          }
-          promises.push(Lambda(array))
+      const PARALLEL_CVS_GET_LIMIT = 10;
+      const NUM_LAMBDAS_IN_PARALLEL = 10;
+      const ROWS_PER_LAMBDA = 1000;
+      // get all relevant jobs
+      let jobCvIds = [];
+      let relevantCvsList = [];
+      let relevantCvsCurrentPromises = [];
+      console.log('preprocessing start ', new Date());
+      for (let i = 0; i < jobPostList.length; i++) {
+        relevantCvsCurrentPromises.push(cronCVList(jobPostList[i])); // cvs where cv upload date < match end or cv upload date > match start
+        if (relevantCvsCurrentPromises.length === PARALLEL_CVS_GET_LIMIT || i === jobPostList.length - 1) {
+           relevantCvsList = await Promise.all(relevantCvsCurrentPromises);
+           relevantCvsCurrentPromises = [];
+           for (let j = 0; j < relevantCvsList.length; j++) {
+             const currentRelevantCvs = relevantCvsList[j];
+             const currentRelevantJob = jobPostList[i - relevantCvsList.length + j + 1];
+             for (let k = 0; k < currentRelevantCvs.length; k++) {
+               jobCvIds.push({cvId: currentRelevantCvs[k].id, jobId: currentRelevantJob.id});
+             }
+           }
         }
       }
-      await Promise.all(promises)
+      console.log('preprocessing end ', new Date());
+      let currentLambdaParamsList = [], curIdx = 0;
+      for (let i = 0; true; i++) {
+        for (let j = 0; j < NUM_LAMBDAS_IN_PARALLEL; j++) {
+          currentLambdaParamsList.push([]);
+          for (let k = 0; k < ROWS_PER_LAMBDA; k++) {
+            currentLambdaParamsList[j].push(jobCvIds[curIdx]);
+            curIdx++;
+            if (curIdx === jobCvIds.length) break;
+          }
+          if (curIdx === jobCvIds.length) break;
+        }
+        await Promise.all(currentLambdaParamsList.map(lambdaParams => Lamda(lambdaParams)));
+      }
+      console.log('lambda processing end ', new Date());
     } catch (err) {
       console.error(err);
     }
