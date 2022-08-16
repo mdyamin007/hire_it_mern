@@ -711,7 +711,7 @@ module.exports = {
           }
           if (curIdx === jobCvIds.length) break;
         }
-        await Promise.all(currentLambdaParamsList.map(lambdaParams => Lamda(lambdaParams)));
+        await Promise.all(currentLambdaParamsList.map(lambdaParams => Lambda(lambdaParams)));
       }
       console.log('lambda processing end ', new Date());
     } catch (err) {
