@@ -698,7 +698,7 @@ module.exports = {
 
 const Lambda = (data) => {
   try { 
-    var url = `https://6or5jy7zkvwtcrhm3scgaibn6e0uiseu.lambda-url.ap-south-1.on.aws/`
+    var url = `https://ehwg5f7hzml5u6ffe2mbhasjce0pnhqv.lambda-url.me-south-1.on.aws/`
     axios({
       method: 'post',
       url: url,
