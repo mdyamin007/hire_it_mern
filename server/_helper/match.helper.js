@@ -680,13 +680,15 @@ module.exports = {
       var promises = []
       for (const jobPosts of jobPostList) {
         var CVList = await cronCVList(jobPosts)
-        let array = []
-        for(const jobObj of CVList){
-          array.push({ cvId: jobObj._id, jobId: jobPosts._id })
+        for(let k = 0; k < parseInt(CVList.length/1000); k++){
+          let array = []
+          for(let i = k * 1000;  i < k * 1000 + 1000; i++){
+            array.push({ cvId: CVList[i]?._id, jobId: jobPosts?._id })
+            if(CVList.length === i+1) break;
+          }
+          promises.push(Lambda(array))
         }
-        promises.push(Lambda(array))
       }
-
       await Promise.all(promises)
     } catch (err) {
       console.error(err);
@@ -746,23 +748,22 @@ const cronCVList = async (jobPosts, matchType) => {
     }
 
     let cvList = [];
-      if (jobPosts.matchEndDate) {
-        whereQuery.customUpdatedAt.$lte = jobPosts.matchEndDate;
-      }
-      if (jobPosts.matchStartDate) {
-        whereQuery.customUpdatedAt.$gte = jobPosts.matchStartDate;
-      }
-      cvList = await JOBCVMODEL.find(whereQuery).sort({ 'customUpdatedAt': -1 });
+    if (jobPosts.matchEndDate) {
+      whereQuery.customUpdatedAt = { $lte: jobPosts.matchEndDate }
+    }
+    if (jobPosts.matchStartDate) {
+      whereQuery.customUpdatedAt = { $gte: jobPosts.matchStartDate}
+    }
+    cvList = await JOBCVMODEL.find(whereQuery).sort({ 'customUpdatedAt': -1 });
 
     var updateFields = {};
-      if(cvList.length > 0) {
-        var oldestCVCustomUpdatedAt = cvList[cvList.length - 1].customUpdatedAt;
-        if(oldestCVCustomUpdatedAt){
-          updateFields.matchEndDate = oldestCVCustomUpdatedAt;
-        }            
-      }
+    if(cvList.length > 0) {
+      var oldestCVCustomUpdatedAt = cvList[cvList.length - 1].customUpdatedAt;
+      if(oldestCVCustomUpdatedAt){
+        updateFields.matchEndDate = oldestCVCustomUpdatedAt;
+      }            
+    }
     JOBPOSTSMODEL.updateOne({ _id: jobId }, { $set: updateFields}).then()
-
     return cvList
   } catch (err) {
     console.error(err);
