@@ -678,7 +678,7 @@ module.exports = {
   cronList: async (jobPostList) => {
     try {
       const PARALLEL_CVS_GET_LIMIT = 10;
-      const NUM_LAMBDAS_IN_PARALLEL = 10;
+      const NUM_LAMBDAS_IN_PARALLEL = 100;
       const ROWS_PER_LAMBDA = 1000;
       // get all relevant jobs
       let jobCvIds = [];

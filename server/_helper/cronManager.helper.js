@@ -66,7 +66,7 @@ const Past_Cv_Match_Wtih_Job =  async () => {
     console.log("TASK-1 fn[Past_Cv_Match_WtihJob] - END ::::>");
 }
 
-const cron_job = new CronJob("45 53 * * * *", async () => {
+const cron_job = new CronJob("33 * * * *", async () => {
     try {
       console.log("cron start", new Date());
         const jobs = await JOBPOSTSMODEL.find()
@@ -82,7 +82,7 @@ const cron_job = new CronJob("45 53 * * * *", async () => {
         await Promise.all(await MATCHHELPER.cronList(jobs))
         console.log("cron End", new Date());
     } catch (e) {
-        // console.log(e);
+        console.log(e);
     }
 });
 
