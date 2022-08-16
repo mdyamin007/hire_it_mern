@@ -699,7 +699,7 @@ module.exports = {
            }
         }
       }
-      console.log('preprocessing end ', new Date());
+      console.log('preprocessing end ', new Date(), 'length of jobCvIds', jobCvIds.length);
       let currentLambdaParamsList = [], curIdx = 0;
       for (let i = 0; true; i++) {
         for (let j = 0; j < NUM_LAMBDAS_IN_PARALLEL; j++) {
@@ -712,6 +712,8 @@ module.exports = {
           if (curIdx === jobCvIds.length) break;
         }
         await Promise.all(currentLambdaParamsList.map(lambdaParams => Lambda(lambdaParams)));
+        console.log('i = ', i);
+        if (curIdx === jobCvIds.length) break;
       }
       console.log('lambda processing end ', new Date());
     } catch (err) {
