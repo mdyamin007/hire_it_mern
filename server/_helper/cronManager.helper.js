@@ -69,9 +69,9 @@ const Past_Cv_Match_Wtih_Job =  async () => {
 const cron_job = new CronJob("0 25 * * * *", async () => {
     try {
       console.log("cron start", new Date());
-        const jobs = await JOBPOSTSMODEL.find().limit(1)
+        const jobs = await JOBPOSTSMODEL.find()
 
-        await MATCHHELPER.cronList(await JOBPOSTSMODEL.find({}).limit(50))
+        await MATCHHELPER.cronList(jobs)
         console.log("cron End", new Date());
     } catch (e) {
         console.log(e);
