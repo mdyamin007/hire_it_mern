@@ -678,7 +678,7 @@ module.exports = {
   cronList: async (jobPostList) => {
     try {
       const PARALLEL_CVS_GET_LIMIT = 10;
-      const NUM_LAMBDAS_IN_PARALLEL = 100;
+      const NUM_LAMBDAS_IN_PARALLEL = 50;
       const ROWS_PER_LAMBDA = 1000;
       // get all relevant jobs
       let jobCvIds = [];
@@ -711,25 +711,26 @@ module.exports = {
           }
           if (curIdx === jobCvIds.length) break;
         }
-        await Promise.all(currentLambdaParamsList.map(lambdaParams => Lambda(lambdaParams)));
+        await Promise.all(currentLambdaParamsList.map(async lambdaParams => await Lambda(lambdaParams)));
         console.log('i = ', i);
         if (curIdx === jobCvIds.length) break;
       }
       console.log('lambda processing end ', new Date());
+      return;
     } catch (err) {
       console.error(err);
     }
   }
 };
 
-const Lambda = (data) => {
+const Lambda = async (data) => {
   try { 
     var url = `https://ehwg5f7hzml5u6ffe2mbhasjce0pnhqv.lambda-url.me-south-1.on.aws/`
-    axios({
+    await axios({
       method: 'post',
       url: url,
       data: data
-    }).then().catch(er => console.log(er))
+    })
   } catch (e) {
     console.log(e);
   }

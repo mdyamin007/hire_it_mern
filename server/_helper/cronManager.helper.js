@@ -66,29 +66,17 @@ const Past_Cv_Match_Wtih_Job =  async () => {
     console.log("TASK-1 fn[Past_Cv_Match_WtihJob] - END ::::>");
 }
 
-const cron_job = new CronJob("33 * * * *", async () => {
+const cron_job = new CronJob("0/30 * * * * *", async () => {
     try {
       console.log("cron start", new Date());
-        const jobs = await JOBPOSTSMODEL.find()
+        const jobs = await JOBPOSTSMODEL.find().limit(1)
 
-        // let promise = []
-        // for (let i = 1; i <= jobs.length / 10; i++) {
-        //   let cpage = i
-        //   let perpage = 10
-        //   let start = cpage * perpage - perpage;
-        //   let end = start + perpage
-        //   promise.push(await MATCHHELPER.cronList(jobs.slice(start, end)))
-        // }
-        await Promise.all(await MATCHHELPER.cronList(jobs))
+        await MATCHHELPER.cronList(await JOBPOSTSMODEL.find({}).limit(50))
         console.log("cron End", new Date());
     } catch (e) {
         console.log(e);
     }
 });
-
-const func = async (data) => {
-    return await MATCHHELPER.cronList(data)
-}
 
 const Future_Cv_Match_Wtih_Job = async () => {
   const startDate = moment
