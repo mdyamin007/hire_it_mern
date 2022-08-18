@@ -678,7 +678,7 @@ module.exports = {
   cronList: async (jobPostList) => {
     try {
       const PARALLEL_CVS_GET_LIMIT = 10;
-      const NUM_LAMBDAS_IN_PARALLEL = 40;
+      const NUM_LAMBDAS_IN_PARALLEL = 20;
       const ROWS_PER_LAMBDA = 1000;
       // get all relevant jobs
       let jobCvIds = [];
@@ -712,6 +712,7 @@ module.exports = {
           if (curIdx === jobCvIds.length) break;
         }
         await Promise.all(currentLambdaParamsList.map(async lambdaParams => await Lambda(lambdaParams)));
+        currentLambdaParamsList = []
         console.log('i = ', i, '& time => ', new Date());
         if (curIdx === jobCvIds.length) break;
       }
@@ -732,7 +733,7 @@ const Lambda = async (data) => {
       data: data
     })
   } catch (e) {
-    // console.log(e);
+    console.log("error")
   }
 }
 
