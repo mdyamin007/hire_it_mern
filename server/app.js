@@ -15,6 +15,8 @@ const dummyAddDataRouter = require("./routers/addData");
 const checkAdmin = require("./middlewares/checkAdmin");
 const CronManager   = require('./_helper/cronManager.helper');
 require("./config/passport");
+const cron = require("./_helper/cronManager.helper")
+cron()
 
 const isProduction = process.env.NODE_ENV === "production";
 
@@ -43,7 +45,7 @@ if (!isProduction) {
 if (isProduction) {
   mongoose.connect(process.env.MONGODB_URI);
 } else {
-  mongoose.connect("mongodb://127.0.0.1:27017/hire_it");
+  mongoose.connect(process.env.MONGODB_URI);
   mongoose.set("debug", false);
 }
 
@@ -101,5 +103,5 @@ app.use(function (err, req, res, next) {
 
 // finally, let's start our server...
 var server = app.listen(process.env.PORT || 5000, function () {
-  console.log("Listening on port " + server.address().port);
+  console.log("Listening on port " + server.address().port, new Date());
 });

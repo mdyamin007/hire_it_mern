@@ -2,6 +2,8 @@ const JOBPOSTSMODEL = require("../models/JobPosts");
 const JOBCVMODEL = require("../models/jobCV");
 const Profile_MatcherModel = require("../models/profileMatcher");
 const moment = require("moment");
+const request = require('request');
+const axios = require("axios")
 
 module.exports = {
 
@@ -70,7 +72,7 @@ module.exports = {
       cvList = await JOBCVMODEL.find(whereQuery).sort({ 'customUpdatedAt': -1 });
 
       for (const cvObj of cvList) {
-
+      
         let matchFieldCount = 0;
         let skillMatchCount = 0;
         let educationMatchCount = 0;
@@ -518,7 +520,6 @@ module.exports = {
     } catch (err) {
       console.log("CATCH ::fn[Cron Cv_Match_Wtih_Job Error occur]:::>");
       console.error(err);
-
     }
   },
 
@@ -672,6 +673,132 @@ module.exports = {
       console.error(err);
 
     }
+  },
+
+  cronList: async (jobPostList) => {
+    try {
+      const PARALLEL_CVS_GET_LIMIT = 10;
+      const NUM_LAMBDAS_IN_PARALLEL = 20;
+      const ROWS_PER_LAMBDA = 1000;
+      // get all relevant jobs
+      let jobCvIds = [];
+      let relevantCvsList = [];
+      let relevantCvsCurrentPromises = [];
+      console.log('preprocessing start ', new Date());
+      for (let i = 0; i < jobPostList.length; i++) {
+        relevantCvsCurrentPromises.push(cronCVList(jobPostList[i])); // cvs where cv upload date < match end or cv upload date > match start
+        if (relevantCvsCurrentPromises.length === PARALLEL_CVS_GET_LIMIT || i === jobPostList.length - 1) {
+           relevantCvsList = await Promise.all(relevantCvsCurrentPromises);
+           relevantCvsCurrentPromises = [];
+           for (let j = 0; j < relevantCvsList.length; j++) {
+             const currentRelevantCvs = relevantCvsList[j];
+             const currentRelevantJob = jobPostList[i - relevantCvsList.length + j + 1];
+             for (let k = 0; k < currentRelevantCvs.length; k++) {
+               jobCvIds.push({cvId: currentRelevantCvs[k].id, jobId: currentRelevantJob.id});
+             }
+           }
+        }
+      }
+      console.log('preprocessing end ', new Date(), 'length of jobCvIds', jobCvIds.length);
+      let currentLambdaParamsList = [], curIdx = 0;
+      for (let i = 0; true; i++) {
+        for (let j = 0; j < NUM_LAMBDAS_IN_PARALLEL; j++) {
+          currentLambdaParamsList.push([]);
+          for (let k = 0; k < ROWS_PER_LAMBDA; k++) {
+            currentLambdaParamsList[j].push(jobCvIds[curIdx]);
+            curIdx++;
+            if (curIdx === jobCvIds.length) break;
+          }
+          if (curIdx === jobCvIds.length) break;
+        }
+        await Promise.all(currentLambdaParamsList.map(async lambdaParams => await Lambda(lambdaParams)));
+        currentLambdaParamsList = []
+        console.log('i = ', i, '& time => ', new Date());
+        if (curIdx === jobCvIds.length) break;
+      }
+      console.log('lambda processing end ', new Date());
+      return;
+    } catch (err) {
+      console.error(err);
+    }
   }
 };
 
+const Lambda = async (data) => {
+  try { 
+    var url = `https://ehwg5f7hzml5u6ffe2mbhasjce0pnhqv.lambda-url.me-south-1.on.aws/`
+    await axios({
+      method: 'post',
+      url: url,
+      data: data
+    })
+  } catch (e) {
+    console.log("error")
+  }
+}
+
+const cronCVList = async (jobPosts, matchType) => {
+  try {
+    var currentDate = new Date();
+    let whereQuery = {};
+    var jobId = jobPosts._id;
+
+    jobPosts.skillCode = jobPosts.skillCode ? jobPosts.skillCode : '';
+    let skillRegex = jobPosts.skillCode.replace(/::/g, ":|:");
+    let skillArray = skillRegex.replace(/:/g, "").split('|');
+    if (skillArray.length == 1 && skillArray[0] == '') {
+      skillRegex = '';
+      skillArray = [];
+    }
+
+    jobPosts.certificationCode = jobPosts.certificationCode ? jobPosts.certificationCode : '';
+    let certificationsRegex = jobPosts.certificationCode.replace(/::/g, ":|:");
+    let certificationsArray = certificationsRegex.replace(/:/g, "").split('|');
+    if (certificationsArray.length == 1 && certificationsArray[0] == '') {
+      certificationsRegex = '';
+      certificationsArray = [];
+    }
+
+    let skillReqCount = skillArray.length;
+    let certificatoinReqCount = certificationsArray.length;
+
+    let orCriteria = [];
+    if (skillReqCount > 0) {
+      orCriteria.push({ skillCode: { $regex: skillRegex } });
+    }
+    if (certificatoinReqCount > 0) {
+      orCriteria.push({ certificationCode: { $regex: certificationsRegex } });
+    }
+    if (orCriteria.length > 0) {
+      whereQuery = {
+        $or: orCriteria
+      };
+    }
+
+    let cvList = [];
+    if (jobPosts.matchEndDate) {
+      whereQuery.customUpdatedAt = { $lte: jobPosts.matchEndDate }
+    }
+    if (jobPosts.matchStartDate) {
+      whereQuery.customUpdatedAt = { $gte: jobPosts.matchStartDate}
+    }
+    cvList = await JOBCVMODEL.find(whereQuery).sort({ 'customUpdatedAt': -1 });
+
+    var updateFields = {};
+    if(cvList.length > 0) {
+      var oldestCVCustomUpdatedAt = cvList[cvList.length - 1].customUpdatedAt;
+      if(oldestCVCustomUpdatedAt){
+        updateFields.matchEndDate = oldestCVCustomUpdatedAt;
+      }            
+    }
+    JOBPOSTSMODEL.updateOne({ _id: jobId }, { $set: updateFields}).then()
+    return cvList
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+// module.exports = {
+//   cronCVList,
+//   Lambda
+// }
